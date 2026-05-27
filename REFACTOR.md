@@ -136,7 +136,7 @@ const Comp = COMPONENTS[section.id as keyof typeof COMPONENTS];
 
 ---
 
-## 🟠 4. `<CtaButton />` als Komponente
+## ✅ 4. `<CtaButton />` als Komponente — ERLEDIGT
 
 **Befund:** `<a class="btn btn-primary">{text}</a>` taucht in 7+ Stellen auf, jedes Mal mit derselben `ctaHref(...)`-Logik aussen rum.
 

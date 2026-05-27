@@ -84,6 +84,7 @@ Pakete:
 
 ## Erledigt (Referenz)
 
+- **`<CtaButton />`-Komponente** ersetzt alle 6 direkten `<a class="btn btn-primary">`-Stellen in Hero, Angebote, Training, Geschichte, Preise. Inklusive ctaHref()-Logik intern, externe URLs (http/mailto/tel) werden 1:1 durchgereicht.
 - **SectionRenderer auf Map-Dispatch** umgestellt (statt 7 if/else-Zeilen ein typsicheres COMPONENTS-Mapping). Bei unbekannter section.id wirft die Komponente einen klaren Error mit Hinweis was zu tun ist.
 - **Hero (Titel + Tagline + CTAs)** liest aus `src/data/hero.json`. Damit ist kein Inhalt mehr hartcodiert ausser den Bubbles im BaseLayout.
 - **JSON-LD `SportsClub`** liest jetzt komplett aus `verein.json` (Name, Adresse, Geo, Sportarten, VDST-Mitgliedschaft, Trainingszeiten). Single source of truth funktioniert auch fuer Strukturdaten.
