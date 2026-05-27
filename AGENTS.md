@@ -297,7 +297,7 @@ Wenn man trotzdem aufraeumen will: Zod-Import auf `import { z } from 'astro/zod'
 - **Bilder auf Training-Seite** werden noch von `duc-essen.de/wp-content/...` geladen (extern). Falls die WordPress-Site abgeschaltet wird, brechen die Bilder. Sollte in `public/images/` migriert werden.
 - **Mitgliedschafts-Logos** kommen via Favicon-URL — wenn die Verbaende ihre Favicons aendern, brechen die Logos. Selbe Loesung: lokal in `public/` ziehen.
 - **`mitgliedschaften`** ist in der `sections`-Collection und hat eine eigene Detail-Seite, taucht aber bewusst nicht in der Navbar auf (`navLabel` ist nicht gesetzt). Wenn das doch erwuenscht ist: `navLabel: Mitgliedschaften` in `sections/mitgliedschaften.md` setzen.
-- **Datenschutz-Text** ist ein Entwurf mit sichtbarem TODO-Hinweis im Body. Muss mit Vorstand abgestimmt werden.
+- **Datenschutz-Text** hat Stand Mai 2018 (uebernommen von duc-essen.de/datenschutzhinweise/). Erwaehnt „Real Cookie Banner" + funktionale Cookies, was im aktuellen Astro-Setup nicht zutrifft — sollte beim naechsten Datenschutz-Review angepasst werden.
 
 ---
 
