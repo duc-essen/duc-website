@@ -1,73 +1,112 @@
-# TODO — Migration auf Astro + GitHub Pages
+# TODO — DUC Essen Website
 
-Stand der Migration des Single-File-Entwurfs (`index.html`) auf Astro mit Deployment via GitHub Actions nach GitHub Pages auf die Custom Domain `duc-essen.de`.
-
----
-
-## Erledigt (initialer Aufbau)
-
-- [x] **Astro v6 aufgesetzt** — `package.json` mit `astro@^6` (installiert: 6.3.8), `astro.config.mjs` mit `site: 'https://duc-essen.de'`, `tsconfig.json` (`strict`), `.gitignore`.
-- [x] **CSS extrahiert** — kompletter `<style>`-Block in `src/styles/global.css` (1122 Zeilen), wird im Layout via `import` eingebunden.
-- [x] **BaseLayout** (`src/layouts/BaseLayout.astro`) mit komplettem `<head>` (SEO-Meta, Open-Graph, Twitter-Card, JSON-LD `SportsClub`, Favicon-SVG, Theme-Color, Poppins-Font), Bubbles-Background, Skip-Link, `<slot/>`, Back-to-Top-Button und allen Inline-Scripts (Mobile-Menue, Navbar-Scroll, Fade-In-Observer, Smooth-Scroll, Active-Section, Back-to-Top, Year).
-- [x] **DucLogo-Komponente** — grosses Vereins-SVG einmalig in `src/components/DucLogo.astro`, mit `class`-Prop, wird in Navbar und Hero verwendet.
-- [x] **Sektionen als Komponenten** — Navbar, Hero, Angebote, Training, Geschichte, Stats, Veranstaltungen, Preise, Kontakt, Mitgliedschaften, Footer. Inhalte unveraendert aus `index.html` uebernommen.
-- [x] **`src/pages/index.astro`** komponiert alle Sektionen im `BaseLayout`.
-- [x] **`public/CNAME`** mit `duc-essen.de`.
-- [x] **GitHub Actions Workflow** `.github/workflows/deploy.yml` mit `actions/checkout@v6`, `withastro/action@v6` (Node 22 default) + `actions/deploy-pages@v5` — entspricht dem aktuellen Snippet aus den [offiziellen Astro-Docs](https://docs.astro.build/en/guides/deploy/github/).
-- [x] **Lokaler Build verifiziert** — `npm run build` erzeugt ~70 KB `dist/index.html`, alle Sektionen, CNAME, JSON-LD enthalten. Preview unter `http://127.0.0.1:4322/` getestet.
+Stand: aktuelle Multi-Page-Architektur (Astro v6) lebt unter https://duc-essen.github.io/duc-website/ mit 10 Seiten (One-Pager + 7 Detail-Seiten + Impressum + Datenschutz). Inhalte sind als Markdown / JSON in Content Collections pflegbar. Hier die offene Liste.
 
 ---
 
-## Offen
+## Hoch — Production-Readiness
 
-### A. GitHub Pages aktivieren
+### Custom Domain `duc-essen.de` umziehen
 
-- [ ] In Repo **Settings → Pages**: Source auf **„GitHub Actions"** stellen.
-- [ ] Workflow `deploy.yml` einmal pushen, Lauf in Actions-Tab pruefen.
-- [ ] DNS fuer `duc-essen.de` setzen (siehe [GitHub-Doku Custom Domains](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)):
-  - Apex: `A`-Records auf `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
-  - Optional: `CNAME` `www.duc-essen.de` → `<gh-user>.github.io`
-- [ ] **„Enforce HTTPS"** aktivieren, sobald GitHub das TLS-Zertifikat ausgestellt hat.
-- [ ] Nach erstem Deploy: pruefen, dass die Custom-Domain unter Settings → Pages eingetragen ist und erhalten bleibt.
+DNS-Zugriff beim Provider steht aktuell aus. Schritt-fuer-Schritt, sobald da:
 
-### B. Migration finalisieren
+- [ ] DNS-Records setzen:
+  - Apex `A`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
+  - Optional `www`-`CNAME`: `<gh-user>.github.io`
+- [ ] `mv public/CNAME.disabled public/CNAME`
+- [ ] `astro.config.mjs`: `site: 'https://duc-essen.de'`, `base` entfernen
+- [ ] Repo-Settings → Pages → Custom domain auf `duc-essen.de`, „Enforce HTTPS" sobald TLS-Zertifikat steht
+- [ ] Commit + push
 
-- [ ] **`index.html` aus dem Repo entfernen**, sobald die Astro-Version live ist und vom Vorstand abgenommen wurde.
-- [ ] **`README.md`** anpassen: lokale Preview-Befehle auf `npm run dev` umstellen, Verweis auf Astro-Setup ergaenzen.
+### Datenschutz-Text mit Realitaet abgleichen
 
-### C. Inhalte in Markdown-Content-Collections ueberfuehren (Astro v6)
+Der eingebaute Text hat Stand Mai 2018 (von duc-essen.de uebernommen) und beschreibt Dinge, die im aktuellen Astro-Setup gar nicht zutreffen:
 
-Damit Vereinsmitglieder Inhalte ohne Astro-Kenntnisse pflegen koennen (LLM-Workflow). Astro v6 nutzt die neue Content-Loader-API:
+- [ ] **Sektion 5 (Cookies):** Astro-Site setzt keine Cookies. „Real Cookie Banner" gibt es nicht.
+- [ ] **Sektion 11 (Real Cookie Banner):** komplett raus oder durch realistische Beschreibung ersetzen.
+- [ ] Cookie-Erwaehnung bei Sektion 6 (Google Maps) ueberdenken — wir laden Google Maps direkt im Iframe.
+- [ ] Verbleibender Text mit Vorstand auf Aktualitaet pruefen.
 
-- [ ] `src/content.config.ts` (neue Location, **nicht** `src/content/config.ts`) mit `defineCollection({ loader: glob({ pattern: "**/*.md", base: "./src/data/veranstaltungen" }), schema: z.object({...}) })`. Siehe [Content Collections Docs](https://docs.astro.build/en/guides/content-collections/).
-- [ ] Markdown-Eintraege unter `src/data/veranstaltungen/*.md` mit Frontmatter (`titel`, `datum`, `ort`, `link`, `body`). Aktuelle Eintraege aus `Veranstaltungen.astro` migrieren.
-- [ ] In den Komponenten via `getCollection('veranstaltungen')` + `render(entry)` rendern.
+### Legacy `index.html` entfernen
 
-### D. Assets / Bilder
+- [ ] Sobald die Astro-Version vom Vorstand abgenommen ist: `rm index.html` im Repo-Root (steht aktuell nur als Migrationsreferenz).
+- [ ] AGENTS.md-Eintrag dazu entfernen.
 
-- [ ] Aktuell extern verlinkt: `duc-essen.de/wp-content/uploads/...` (Hero-OG-Bild, Training-Bilder). Pruefen, ob sie ins Repo unter `public/images/` wandern sollen — entkoppelt von WordPress, aber Repo-Groesse steigt.
-- [ ] Falls lokal: Astro `<Image />` aus `astro:assets` fuer Lazy/AVIF/WebP einsetzen.
+---
 
-### E. SEO / Performance
+## Mittel — SEO + Robustheit
 
-- [ ] `@astrojs/sitemap` integrieren: `npx astro add sitemap`, dann `sitemap-index.xml` automatisch generiert.
-- [ ] `robots.txt` in `public/` ergaenzen.
-- [ ] Nach Go-Live: [Rich-Results-Test](https://search.google.com/test/rich-results) fuer JSON-LD, [opengraph.xyz](https://www.opengraph.xyz/) fuer OG-Tags, Lighthouse vor/nach Migration vergleichen.
+### Sitemap + robots.txt
 
-### F. Aufraeumarbeiten in den Komponenten
+- [ ] `npx astro add sitemap` — generiert `sitemap-index.xml` automatisch fuer alle 10 Seiten.
+- [ ] `public/robots.txt` ergaenzen (mit Hinweis auf Sitemap-URL).
 
-Bekannte „Quick-and-Dirty"-Punkte aus der 1:1-Uebernahme:
+### Externe Bilder lokalisieren
 
-- [ ] Inline-`style="..."`-Attribute reduzieren (besonders in `Veranstaltungen.astro`, `Preise.astro`, `Kontakt.astro`, `Mitgliedschaften.astro`) — in CSS-Klassen ueberfuehren.
-- [ ] Inline-`onmouseover`/`onmouseout` in `Mitgliedschaften.astro` durch CSS-`:hover` ersetzen.
-- [ ] Die `.fade-in`-Markierung an `<div class="feature-card fade-in">` auf den Container-Wrapper verschieben, sonst flackern die einzelnen Karten unkoordiniert.
-- [ ] Stats-Counter-Animation (das `data-target`-Attribut in `Stats.astro`) ist im aktuellen Script nicht angebunden — entweder Animation hinzufuegen oder Attribut entfernen.
+Trainings-Bilder kommen aktuell von `duc-essen.de/wp-content/...` (Quelle: `src/content/sections/training.md` Frontmatter `training.bilder`). Falls WordPress-Site abgeschaltet wird, brechen sie.
+
+- [ ] Bilder in `public/images/training/` ziehen
+- [ ] Frontmatter-URLs auf relative Pfade umstellen
+- [ ] `astro:assets <Image />`-Komponente fuer Lazy/AVIF/WebP einsetzen
+- [ ] Gilt auch fuer OG-Image in `BaseLayout.astro` (aktuell `Home-1-b.jpg` extern)
+
+### Mitgliedschafts-Logos lokalisieren
+
+CMAS / VDST / TSV NRW Logos kommen via Favicon-URL der jeweiligen Verbaende — brechen wenn Verbaende ihre Favicons aendern.
+
+- [ ] Logos in `public/images/mitgliedschaften/` ziehen
+- [ ] `src/content/mitgliedschaften/*.md` Frontmatter `logoUrl` auf relative Pfade
+
+### Live-Verifikation der History-API
+
+- [ ] Im Browser pruefen: Klick auf „Angebote" auf der Hauptseite → URL wird `/duc-website/angebote`. Scroll-Spy aktualisiert URL kontinuierlich (`replaceState`). Back-Button scrollt zurueck. Direct-Refresh auf `/duc-website/angebote` zeigt Detail-Seite.
+
+---
+
+## Niedrig — Polish + restlicher Markdown-Ausbau
+
+### Hero + Stats in Collections holen
+
+Beide aktuell als hartcodierte Komponenten (`src/components/Hero.astro`, `src/components/Stats.astro`). Wenn Tagline/Mitgliederzahlen pflegbar werden sollen:
+
+- [ ] **Hero:** neue Section `src/content/sections/hero.md` mit `title`, `subtitle`, `cta1`, `cta2`. Hero-Komponente liest daraus.
+- [ ] **Stats:** entweder neue Collection `src/data/stats.json` (4 Eintraege: Jahre, Mitglieder, Trainings, LLSP) — oder Stats-Block ins Frontmatter einer Section.
+
+### Stats-Counter-Animation
+
+- [ ] `data-target`-Attribute liegen brach. Entweder Counter-JS im BaseLayout schreiben (IntersectionObserver + numerischer Zaehler) oder Attribute entfernen.
+
+### Inline-Styles in CSS-Klassen ziehen
+
+Die Komponenten `Veranstaltungen`, `Preise`, `Kontakt`, `Mitgliedschaften` haben noch viele `style="..."`-Attribute (1:1 aus dem Single-File-Entwurf).
+
+- [ ] Inline-Styles in CSS-Klassen ueberfuehren (entweder in `global.css` oder in `<style>`-Blocks der jeweiligen Komponente).
+- [ ] Inline-`onmouseover`/`onmouseout` in Mitgliedschaften.astro durch CSS-`:hover` ersetzen (teilweise erledigt).
+
+### `.fade-in`-Animation
+
+- [ ] Aktuell pro Karte → Karten flackern beim Scroll asynchron. Stattdessen pro Container-Sektion observieren.
+
+### Navigation Hint auf Detail-Seiten
+
+- [ ] Aktuell keine Visual-Cue, dass man auf einer Detail-Seite ist (nur Navbar verhaelt sich anders). Optional: Breadcrumb oder „Zurueck zur Uebersicht"-Link unterhalb der Sektion.
+
+### View Transitions ausprobieren
+
+- [ ] `<ClientRouter />` einbauen (Astro v6) — smooth animierte Uebergaenge zwischen Detail-Seiten und One-Pager. Nice-to-have, kein Muss.
+
+---
+
+## Erledigt (Referenz)
+
+Astro-Setup, Komponenten-Migration aus `index.html`, GitHub Pages-Deployment, Multi-Page-Architektur mit Detail-Seiten pro Sektion, vollstaendige Markdown/JSON-Pflege fuer alle Sektionen + Items, Icon-Komponenten mit Slug-Enum-Validierung, History API fuer teilbare URLs im One-Pager, Impressum (§ 5 TMG), Datenschutz (Vereins-Text Mai 2018), AGENTS.md / README.md als Onboarding-Doku.
 
 ---
 
 ## Referenzen
 
+- [AGENTS.md](./AGENTS.md) — vollstaendiges Briefing inkl. Schema-Cheat-Sheet
+- [Astro Docs — Content Collections](https://docs.astro.build/en/guides/content-collections/)
+- [Astro Docs — Routing](https://docs.astro.build/en/guides/routing/)
 - [Astro Docs — Deploy to GitHub Pages](https://docs.astro.build/en/guides/deploy/github/)
-- [withastro/action (GitHub)](https://github.com/withastro/action)
-- [Astro Deploy auf GitHub Marketplace](https://github.com/marketplace/actions/astro-deploy)
-- [GitHub Docs: Custom Domains fuer Pages](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)
+- [GitHub Docs — Custom Domains fuer Pages](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)
