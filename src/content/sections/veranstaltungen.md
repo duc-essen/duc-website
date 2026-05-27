@@ -1,6 +1,6 @@
 ---
 title: Termine
-subtitle: Aktuelle Vereinstermine – direkt aus unserem Vereinsplaner (täglicher Sync)
+subtitle: Aus unserem Vereinsplaner – täglich aktualisiert
 navLabel: Termine
 order: 4
 ---
