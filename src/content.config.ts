@@ -68,20 +68,27 @@ const mitgliedschaften = defineCollection({
   }),
 });
 
-// Veranstaltungen: kommen jetzt LIVE aus dem Vereinsplaner-iCal-Feed,
-// gefiltert nach oeffentlichen + zukuenftigen Events.
-// Der Vorstand pflegt im Vereinsplaner; Astro baut hier neu (siehe Cron in
-// .github/workflows/deploy.yml).
+// Schema fuer Vereinsplaner-Events (gleiches Schema fuer beide Collections).
+const eventSchema = z.object({
+  summary: z.string(),
+  start: z.date(),
+  end: z.date().optional(),
+  location: z.string().optional(),
+  description: z.string().default(''),
+  url: z.string().url().optional(),
+});
+
+// Veranstaltungen: alle oeffentlichen, zukuenftigen Events
+// (kein Training/Vorstand/Papnoe).
 const veranstaltungen = defineCollection({
-  loader: vereinsplanerLoader(),
-  schema: z.object({
-    summary: z.string(),
-    start: z.date(),
-    end: z.date().optional(),
-    location: z.string().optional(),
-    description: z.string().default(''),
-    url: z.string().url().optional(),
-  }),
+  loader: vereinsplanerLoader({ mode: 'public' }),
+  schema: eventSchema,
+});
+
+// Trainings: die naechsten 6 Trainings-Einheiten (Titel beginnt mit "Training").
+const trainings = defineCollection({
+  loader: vereinsplanerLoader({ mode: 'training', limit: 6 }),
+  schema: eventSchema,
 });
 
 // Geschichte: Timeline-Eintraege, Beschreibungstext im Markdown-Body.
@@ -123,6 +130,7 @@ export const collections = {
   angebote,
   mitgliedschaften,
   veranstaltungen,
+  trainings,
   geschichte,
   vorstand,
   preise,

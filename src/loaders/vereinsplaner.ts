@@ -1,25 +1,17 @@
 /**
  * Custom Astro Content Loader fuer Vereinsplaner-iCal-Feed.
  *
- * Wird zur Build-Zeit aufgerufen, holt den oeffentlichen iCal-Feed,
- * filtert interne Termine (Training, Vorstandssitzung, Apnoe-Training) raus
- * und liefert eine Liste oeffentlicher Events.
+ * Eine Funktion, zwei Modes:
+ *   - 'public'   → alle zukuenftigen Events ausser Training/Vorstand/Papnoe
+ *   - 'training' → nur Events deren Titel mit "Training" beginnt
  *
- * Bei Netz-/Parse-Fehlern: leere Liste zurueck, Build laeuft trotzdem durch
- * (alte Site bleibt live).
+ * Wird zur Build-Zeit aufgerufen. Bei Netz-/Parse-Fehlern: leere Liste,
+ * Build laeuft trotzdem durch.
  */
 import type { Loader } from 'astro/loaders';
 
 const ICAL_URL =
   'https://api.vereinsplaner.at/v1/public/ical/3b22bae6-cb37-4e7c-8da4-f69f4563fd82.ics';
-
-// Events deren SUMMARY eines dieser Patterns matched, werden gefiltert.
-// Case-insensitive, irgendwo im Titel.
-const DENY_PATTERNS: RegExp[] = [
-  /training/i,
-  /vorstand/i,
-  /papnoe/i,
-];
 
 interface VEvent {
   type: string;
@@ -32,41 +24,68 @@ interface VEvent {
   url?: string;
 }
 
-export function vereinsplanerLoader(): Loader {
+export interface VereinsplanerLoaderOptions {
+  /**
+   * 'public'   → alle Vereinstermine ausser Trainings/Vorstand/Papnoe
+   * 'training' → ausschliesslich Trainings (Titel beginnt mit "Training")
+   */
+  mode: 'public' | 'training';
+  /** Maximale Anzahl an Eintraegen (sortiert nach Datum aufsteigend). */
+  limit?: number;
+}
+
+function matchesMode(summary: string, mode: 'public' | 'training'): boolean {
+  if (mode === 'training') {
+    return /^training/i.test(summary);
+  }
+  // public: alles ausser interne Termine
+  return (
+    !/^training/i.test(summary) &&
+    !/vorstand/i.test(summary) &&
+    !/papnoe/i.test(summary)
+  );
+}
+
+export function vereinsplanerLoader(opts: VereinsplanerLoaderOptions): Loader {
   return {
-    name: 'vereinsplaner-ical',
+    name: `vereinsplaner-${opts.mode}`,
     load: async ({ store, logger, parseData, generateDigest }) => {
       store.clear();
       let events: VEvent[];
       try {
-        const ical = (await import('node-ical')) as unknown as {
-          async: { fromURL: (url: string) => Promise<Record<string, VEvent>> };
+        // node-ical ist ein CJS-Modul; dynamic import wrappt es in { default: ... }
+        const icalModule = (await import('node-ical')) as unknown as {
+          default: {
+            async: { fromURL: (url: string) => Promise<Record<string, VEvent>> };
+          };
         };
-        const raw = await ical.async.fromURL(ICAL_URL);
+        const raw = await icalModule.default.async.fromURL(ICAL_URL);
         events = Object.values(raw).filter((e) => e.type === 'VEVENT');
-        logger.info(`Geladen: ${events.length} VEVENTs aus Vereinsplaner.`);
+        logger.info(`Vereinsplaner-Feed: ${events.length} VEVENTs geladen.`);
       } catch (err) {
         logger.error(
-          `Vereinsplaner-Feed nicht erreichbar: ${(err as Error).message}. ` +
-            `Veranstaltungen-Sektion wird leer angezeigt.`
+          `Vereinsplaner-Feed nicht erreichbar: ${(err as Error).message}`
         );
         return;
       }
 
       const now = Date.now();
-      const upcoming = events
-        .filter((e) => {
-          if (!e.start) return false;
-          if (new Date(e.start).getTime() <= now) return false;
-          if (!e.summary) return false;
-          if (DENY_PATTERNS.some((p) => p.test(e.summary!))) return false;
-          return true;
-        })
-        .sort((a, b) => new Date(a.start!).getTime() - new Date(b.start!).getTime());
+      let filtered = events
+        .filter((e) => e.start && new Date(e.start).getTime() > now)
+        .filter((e) => e.summary && matchesMode(e.summary, opts.mode))
+        .sort(
+          (a, b) => new Date(a.start!).getTime() - new Date(b.start!).getTime()
+        );
 
-      logger.info(`Davon oeffentlich + zukuenftig: ${upcoming.length}.`);
+      if (opts.limit !== undefined) {
+        filtered = filtered.slice(0, opts.limit);
+      }
 
-      for (const e of upcoming) {
+      logger.info(
+        `Mode "${opts.mode}"${opts.limit ? ` (limit ${opts.limit})` : ''}: ${filtered.length} Eintraege.`
+      );
+
+      for (const e of filtered) {
         const data = {
           summary: e.summary!,
           start: new Date(e.start!),
