@@ -1,0 +1,74 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+
+interface Props {
+  title?: string;
+  frontmatter?: { title?: string; description?: string };
+}
+
+// Astro Markdown-Pages liefern die Frontmatter ueber `frontmatter`-Prop;
+// fuer .astro-Verwendung kann title auch direkt gesetzt werden.
+const props = Astro.props;
+const title = props.title ?? props.frontmatter?.title ?? 'DUC Essen';
+const description = props.frontmatter?.description ?? `${title} – DUC Essen`;
+---
+<BaseLayout title={`${title} – DUC Essen`} description={description}>
+  <Navbar isStandalone={true} />
+  <main id="main-content" class="legal-main">
+    <article class="legal">
+      <h1>{title}</h1>
+      <slot />
+    </article>
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  .legal-main {
+    padding-top: 7rem;
+    padding-bottom: 4rem;
+    background: var(--gray-light);
+    min-height: 100vh;
+  }
+  .legal {
+    max-width: 800px;
+    margin: 0 auto;
+    background: white;
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+    color: #333;
+    line-height: 1.7;
+  }
+  .legal :global(h1) {
+    color: var(--blue);
+    margin-bottom: 1.5rem;
+  }
+  .legal :global(h2) {
+    color: var(--blue);
+    margin: 2rem 0 1rem;
+    font-size: 1.3rem;
+  }
+  .legal :global(h3) {
+    color: var(--blue-dark);
+    margin: 1.5rem 0 0.5rem;
+    font-size: 1.1rem;
+  }
+  .legal :global(p) {
+    margin-bottom: 1rem;
+  }
+  .legal :global(a) {
+    color: var(--blue-light);
+  }
+  .legal :global(ul),
+  .legal :global(ol) {
+    margin: 0.5rem 0 1rem 1.5rem;
+  }
+  @media (max-width: 640px) {
+    .legal {
+      padding: 2rem 1.25rem;
+    }
+  }
+</style>

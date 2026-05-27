@@ -1,6 +1,13 @@
 ---
 import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import EventIcon from './icons/EventIcon.astro';
+
+interface Props {
+  section: CollectionEntry<'sections'>;
+  isStandalone?: boolean;
+}
+const { section } = Astro.props;
 
 const entries = (await getCollection('veranstaltungen')).sort(
   (a, b) => a.data.order - b.data.order
@@ -9,10 +16,10 @@ const rendered = await Promise.all(
   entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content }))
 );
 ---
-<section class="veranstaltungen" id="veranstaltungen" style="background: var(--white);">
+<section class="veranstaltungen" id={section.id} style="background: var(--white);">
   <div class="section-title">
-    <h2>Veranstaltungen &amp; Tipps</h2>
-    <p>Spannende Events und Ausflugsziele für Taucher und Wassersportler</p>
+    <h2>{section.data.title}</h2>
+    {section.data.subtitle && <p>{section.data.subtitle}</p>}
   </div>
   <div style="max-width: 1100px; margin: 0 auto;">
     <div class="features-grid">
@@ -52,26 +59,9 @@ const rendered = await Promise.all(
     font-size: 0.8rem;
     font-weight: 600;
   }
-  .event-badge-gold {
-    background: var(--gold);
-    color: var(--blue-dark);
-  }
-  .event-badge-blue {
-    background: var(--blue);
-    color: white;
-  }
-  .event-description {
-    color: var(--gray);
-    font-size: 0.95rem;
-    margin-bottom: 1rem;
-  }
-  .event-description :global(p) {
-    margin: 0 0 0.5rem;
-  }
-  .event-infos {
-    background: var(--gray-light);
-    padding: 1rem;
-    border-radius: 10px;
-    font-size: 0.9rem;
-  }
+  .event-badge-gold { background: var(--gold); color: var(--blue-dark); }
+  .event-badge-blue { background: var(--blue); color: white; }
+  .event-description { color: var(--gray); font-size: 0.95rem; margin-bottom: 1rem; }
+  .event-description :global(p) { margin: 0 0 0.5rem; }
+  .event-infos { background: var(--gray-light); padding: 1rem; border-radius: 10px; font-size: 0.9rem; }
 </style>

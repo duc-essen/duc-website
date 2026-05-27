@@ -1,9 +1,13 @@
 ---
 import { getCollection } from 'astro:content';
+import { pathTo } from '../utils/url';
 
 const vorstand = (await getCollection('vorstand')).sort(
   (a, b) => a.data.order - b.data.order
 );
+const sections = (await getCollection('sections'))
+  .filter((s) => s.data.navLabel)
+  .sort((a, b) => a.data.order - b.data.order);
 ---
 <footer>
   <div class="footer-content">
@@ -20,20 +24,18 @@ const vorstand = (await getCollection('vorstand')).sort(
     </div>
     <div class="footer-section">
       <h4>Quick Links</h4>
-      <a href="#home">Start</a>
-      <a href="#angebote">Angebote</a>
-      <a href="#training">Training</a>
-      <a href="#geschichte">Geschichte</a>
-      <a href="#veranstaltungen">Events</a>
-      <a href="#preise">Preise</a>
-      <a href="#kontakt">Kontakt</a>
+      <a href={pathTo('')}>Start</a>
+      {sections.map((s) => (
+        <a href={pathTo(s.id)}>{s.data.navLabel}</a>
+      ))}
     </div>
     <div class="footer-section">
-      <h4>Impressum</h4>
+      <h4>Recht</h4>
       <p>Deutscher Unterwasserclub Essen e.V.</p>
       <p>Registergericht: Amtsgericht Essen</p>
       <p>Registernummer: VR 1507</p>
-      <a href="https://duc-essen.de/datenschutzhinweise/" target="_blank" style="margin-top: 1rem; display: inline-block;">Datenschutz</a>
+      <a href={pathTo('impressum')} style="margin-top: 1rem; display: inline-block;">Impressum</a>
+      <a href={pathTo('datenschutz')} style="display: inline-block;">Datenschutz</a>
     </div>
   </div>
   <div class="footer-bottom">

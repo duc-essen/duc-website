@@ -1,6 +1,14 @@
 ---
 import { getCollection, render } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import TimelineIcon from './icons/TimelineIcon.astro';
+import { ctaHref } from '../utils/url';
+
+interface Props {
+  section: CollectionEntry<'sections'>;
+  isStandalone?: boolean;
+}
+const { section, isStandalone = false } = Astro.props;
 
 const entries = (await getCollection('geschichte')).sort(
   (a, b) => a.data.order - b.data.order
@@ -8,11 +16,13 @@ const entries = (await getCollection('geschichte')).sort(
 const rendered = await Promise.all(
   entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content }))
 );
+
+const ctaLink = ctaHref(section.data.cta?.href, isStandalone);
 ---
-<section class="geschichte" id="geschichte">
+<section class="geschichte" id={section.id}>
   <div class="section-title">
-    <h2>Unsere Geschichte</h2>
-    <p>Mehr als 60 Jahre Leidenschaft für den Unterwassersport</p>
+    <h2>{section.data.title}</h2>
+    {section.data.subtitle && <p>{section.data.subtitle}</p>}
   </div>
   <div class="timeline">
     {rendered.map(({ entry, Content }) => (
@@ -28,7 +38,9 @@ const rendered = await Promise.all(
       </div>
     ))}
   </div>
-  <div style="text-align: center; margin-top: 2rem;">
-    <a href="#kontakt" class="btn btn-primary">Werde Teil unserer Geschichte</a>
-  </div>
+  {section.data.cta && ctaLink && (
+    <div style="text-align: center; margin-top: 2rem;">
+      <a href={ctaLink} class="btn btn-primary">{section.data.cta.text}</a>
+    </div>
+  )}
 </section>

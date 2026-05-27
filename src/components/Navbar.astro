@@ -1,23 +1,37 @@
 ---
-import DucLogo from "./DucLogo.astro";
+import { getCollection } from 'astro:content';
+import DucLogo from './DucLogo.astro';
+import { pathTo } from '../utils/url';
+
+interface Props {
+  isStandalone?: boolean;
+}
+const { isStandalone = false } = Astro.props;
+
+const sections = (await getCollection('sections'))
+  .filter((s) => s.data.navLabel)
+  .sort((a, b) => a.data.order - b.data.order);
+
+const sectionHref = (slug: string) => (isStandalone ? pathTo(slug) : `#${slug}`);
+const homeHref = isStandalone ? pathTo('') : '#home';
+const logoHref = pathTo('');
 ---
-    <nav id="navbar">
-        <div class="logo">
-            <DucLogo class="nav-logo-svg" />
-            <span class="logo-text">DUC ESSEN</span>
-        </div>
-        <ul class="nav-links" id="navLinks">
-            <li><a href="#home">Start</a></li>
-            <li><a href="#angebote">Angebote</a></li>
-            <li><a href="#training">Training</a></li>
-            <li><a href="#geschichte">Geschichte</a></li>
-            <li><a href="#veranstaltungen">Events</a></li>
-            <li><a href="#preise">Preise</a></li>
-            <li><a href="#kontakt">Kontakt</a></li>
-        </ul>
-        <div class="menu-toggle" id="menuToggle">
-            <span></span>
-            <span></span>
-            <span></span>
-        </div>
-    </nav>
+<nav id="navbar">
+  <div class="logo">
+    <a href={logoHref} aria-label="Zur Startseite" style="display: flex; align-items: center; gap: 1rem; text-decoration: none;">
+      <DucLogo class="nav-logo-svg" />
+      <span class="logo-text">DUC ESSEN</span>
+    </a>
+  </div>
+  <ul class="nav-links" id="navLinks">
+    <li><a href={homeHref}>Start</a></li>
+    {sections.map((s) => (
+      <li><a href={sectionHref(s.id)}>{s.data.navLabel}</a></li>
+    ))}
+  </ul>
+  <div class="menu-toggle" id="menuToggle">
+    <span></span>
+    <span></span>
+    <span></span>
+  </div>
+</nav>

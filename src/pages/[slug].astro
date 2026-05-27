@@ -1,0 +1,39 @@
+---
+import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Navbar from '../components/Navbar.astro';
+import Footer from '../components/Footer.astro';
+import SectionRenderer from '../components/SectionRenderer.astro';
+
+export async function getStaticPaths() {
+  const sections = await getCollection('sections');
+  return sections.map((section) => ({
+    params: { slug: section.id },
+    props: { section },
+  }));
+}
+
+interface Props {
+  section: CollectionEntry<'sections'>;
+}
+const { section } = Astro.props;
+
+const title = `${section.data.title} – DUC Essen`;
+const description =
+  section.data.subtitle ?? `${section.data.title} beim DUC Essen.`;
+---
+<BaseLayout title={title} description={description}>
+  <Navbar isStandalone={true} />
+  <main id="main-content" class="standalone-main">
+    <SectionRenderer section={section} isStandalone={true} />
+  </main>
+  <Footer />
+</BaseLayout>
+
+<style>
+  /* Auf Detail-Seiten kein Hero, also Abstand fuer die fixed Navbar. */
+  .standalone-main {
+    padding-top: 6rem;
+  }
+</style>

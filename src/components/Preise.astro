@@ -1,13 +1,22 @@
 ---
 import { getCollection } from 'astro:content';
+import type { CollectionEntry } from 'astro:content';
 import PriceIcon from './icons/PriceIcon.astro';
+import { ctaHref } from '../utils/url';
+
+interface Props {
+  section: CollectionEntry<'sections'>;
+  isStandalone?: boolean;
+}
+const { section, isStandalone = false } = Astro.props;
 
 const preise = (await getCollection('preise')).sort((a, b) => a.data.order - b.data.order);
+const ctaLink = ctaHref(section.data.cta?.href, isStandalone);
 ---
-<section class="preise" id="preise" style="background: var(--gray-light);">
+<section class="preise" id={section.id} style="background: var(--gray-light);">
   <div class="section-title">
-    <h2>Mitgliedsbeiträge</h2>
-    <p>Faire Preise für deinen Tauchsport</p>
+    <h2>{section.data.title}</h2>
+    {section.data.subtitle && <p>{section.data.subtitle}</p>}
   </div>
   <div style="max-width: 1000px; margin: 0 auto;">
     <div class="features-grid" style="margin-bottom: 3rem;">
@@ -21,8 +30,10 @@ const preise = (await getCollection('preise')).sort((a, b) => a.data.order - b.d
         </div>
       ))}
     </div>
-    <div style="text-align: center; margin-top: 2rem;">
-      <a href="#kontakt" class="btn btn-primary">Gemeinsam abtauchen</a>
-    </div>
+    {section.data.cta && ctaLink && (
+      <div style="text-align: center; margin-top: 2rem;">
+        <a href={ctaLink} class="btn btn-primary">{section.data.cta.text}</a>
+      </div>
+    )}
   </div>
 </section>

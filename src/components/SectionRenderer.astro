@@ -1,0 +1,23 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import Angebote from './Angebote.astro';
+import Training from './Training.astro';
+import Geschichte from './Geschichte.astro';
+import Veranstaltungen from './Veranstaltungen.astro';
+import Preise from './Preise.astro';
+import Kontakt from './Kontakt.astro';
+import Mitgliedschaften from './Mitgliedschaften.astro';
+
+interface Props {
+  section: CollectionEntry<'sections'>;
+  isStandalone?: boolean;
+}
+const { section, isStandalone = false } = Astro.props;
+---
+{section.id === 'angebote' && <Angebote section={section} isStandalone={isStandalone} />}
+{section.id === 'training' && <Training section={section} isStandalone={isStandalone} />}
+{section.id === 'geschichte' && <Geschichte section={section} isStandalone={isStandalone} />}
+{section.id === 'veranstaltungen' && <Veranstaltungen section={section} isStandalone={isStandalone} />}
+{section.id === 'preise' && <Preise section={section} isStandalone={isStandalone} />}
+{section.id === 'kontakt' && <Kontakt section={section} isStandalone={isStandalone} />}
+{section.id === 'mitgliedschaften' && <Mitgliedschaften section={section} isStandalone={isStandalone} />}
