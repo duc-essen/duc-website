@@ -20,7 +20,7 @@ E-Mail: [katharina@duc-essen.de](mailto:katharina@duc-essen.de)
 - **1. Vorsitzende:** Katharina Sina
 - **2. Vorsitzender:** Peter Kuchta
 - **Schriftführer:** Helge Lösche
-- **Kassenwart:** Martin A.
+- **Kassenwart:** Martin Arens
 - **Gerätewart:** Jens Schmalenberg
 
 ## Registereintrag

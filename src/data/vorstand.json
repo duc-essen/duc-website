@@ -2,6 +2,6 @@
   { "id": "vorsitzende",   "rolle": "1. Vorsitzende",    "name": "Katharina Sina",    "order": 1 },
   { "id": "vorsitzender",  "rolle": "2. Vorsitzender",   "name": "Peter Kuchta",      "order": 2 },
   { "id": "schriftfuehrer","rolle": "Schriftführer",     "name": "Helge Lösche",      "order": 3 },
-  { "id": "kassenwart",    "rolle": "Kassenwart",        "name": "Martin A.",         "order": 4 },
+  { "id": "kassenwart",    "rolle": "Kassenwart",        "name": "Martin Arens",      "order": 4 },
   { "id": "geraetewart",   "rolle": "Gerätewart",        "name": "Jens Schmalenberg", "order": 5 }
 ]
