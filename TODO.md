@@ -1,6 +1,6 @@
 # TODO — DUC Essen Website
 
-Stand: aktuelle Multi-Page-Architektur (Astro v6) lebt unter https://duc-essen.github.io/duc-website/ mit 10 Seiten (One-Pager + 7 Detail-Seiten + Impressum + Datenschutz). Inhalte sind als Markdown / JSON in Content Collections pflegbar. Hier die offene Liste.
+Stand: Astro v6 Multi-Page-Site mit Cookie-Banner (Klaro), lokalen Fonts (Inter), lokalen Bildern, History-API fuer teilbare URLs und 10 Seiten live unter https://duc-essen.github.io/duc-website/. Hier die noch offene Liste.
 
 ---
 
@@ -8,7 +8,7 @@ Stand: aktuelle Multi-Page-Architektur (Astro v6) lebt unter https://duc-essen.g
 
 ### Custom Domain `duc-essen.de` umziehen
 
-DNS-Zugriff beim Provider steht aktuell aus. Schritt-fuer-Schritt, sobald da:
+DNS-Zugriff beim Provider steht aktuell aus. Schritt-fuer-Schritt sobald da:
 
 - [ ] DNS-Records setzen:
   - Apex `A`: `185.199.108.153`, `185.199.109.153`, `185.199.110.153`, `185.199.111.153`
@@ -18,14 +18,12 @@ DNS-Zugriff beim Provider steht aktuell aus. Schritt-fuer-Schritt, sobald da:
 - [ ] Repo-Settings → Pages → Custom domain auf `duc-essen.de`, „Enforce HTTPS" sobald TLS-Zertifikat steht
 - [ ] Commit + push
 
-### Datenschutz-Text mit Realitaet abgleichen
+### Video extern hosten oder Git LFS einrichten
 
-Der eingebaute Text hat Stand Mai 2018 (von duc-essen.de uebernommen) und beschreibt Dinge, die im aktuellen Astro-Setup gar nicht zutreffen:
-
-- [ ] **Sektion 5 (Cookies):** Astro-Site setzt keine Cookies. „Real Cookie Banner" gibt es nicht.
-- [ ] **Sektion 11 (Real Cookie Banner):** komplett raus oder durch realistische Beschreibung ersetzen.
-- [ ] Cookie-Erwaehnung bei Sektion 6 (Google Maps) ueberdenken — wir laden Google Maps direkt im Iframe.
-- [ ] Verbleibender Text mit Vorstand auf Aktualitaet pruefen.
+- [ ] `public/media/widdauen-2023.mp4` ist 91 MB (knapp unter GitHubs Hard-Limit). Optionen:
+  - Bei weiteren Videos: `git lfs install` + `git lfs track "*.mp4"` (Git LFS hat 1 GB Free-Quota auf GitHub)
+  - Oder Video extern lassen (wo es jetzt im Original auf s3.tmhart.de lag) und nur einbetten
+  - Heute kein akutes Problem, aber bei waeiteren grossen Files relevant.
 
 ---
 
@@ -36,33 +34,21 @@ Der eingebaute Text hat Stand Mai 2018 (von duc-essen.de uebernommen) und beschr
 - [ ] `npx astro add sitemap` — generiert `sitemap-index.xml` automatisch fuer alle 10 Seiten.
 - [ ] `public/robots.txt` ergaenzen (mit Hinweis auf Sitemap-URL).
 
-### Externe Bilder lokalisieren
+### Datenschutz-Text mit Vorstand nochmal abgleichen
 
-Trainings-Bilder kommen aktuell von `duc-essen.de/wp-content/...` (Quelle: `src/content/sections/training.md` Frontmatter `training.bilder`). Falls WordPress-Site abgeschaltet wird, brechen sie.
+Der Text ist beim Umzug auf Astro + Klaro durchstrukturiert worden (Cookies-Sektion ist jetzt akkurat: kein Real-Cookie-Banner, sondern Klaro; Google Maps + Vereinsplaner sind opt-in). Sollte vor Custom-Domain-Live nochmal vom Vorstand abgenommen werden.
 
-- [ ] Bilder in `public/images/training/` ziehen
-- [ ] Frontmatter-URLs auf relative Pfade umstellen
-- [ ] `astro:assets <Image />`-Komponente fuer Lazy/AVIF/WebP einsetzen
-- [ ] Gilt auch fuer OG-Image in `BaseLayout.astro` (aktuell `Home-1-b.jpg` extern)
+### Live-Verifikation im Browser
 
-### Mitgliedschafts-Logos lokalisieren
-
-CMAS / VDST / TSV NRW Logos kommen via Favicon-URL der jeweiligen Verbaende — brechen wenn Verbaende ihre Favicons aendern.
-
-- [ ] Logos in `public/images/mitgliedschaften/` ziehen
-- [ ] `src/content/mitgliedschaften/*.md` Frontmatter `logoUrl` auf relative Pfade
-
-### Live-Verifikation der History-API
-
-- [ ] Im Browser pruefen: Klick auf „Angebote" auf der Hauptseite → URL wird `/duc-website/angebote`. Scroll-Spy aktualisiert URL kontinuierlich (`replaceState`). Back-Button scrollt zurueck. Direct-Refresh auf `/duc-website/angebote` zeigt Detail-Seite.
+- [ ] Manuelles Smoke-Testing nach jedem groesseren Refactor: Klick auf „Angebote" auf Hauptseite → URL wird `/duc-website/angebote`, ohne Page-Reload. Detail-Seite direkt aufrufen → laedt statisch. Cookie-Banner abweisen → Google Maps bleibt geblockt. Akzeptieren → Map laedt.
 
 ---
 
-## Niedrig — Polish + restlicher Markdown-Ausbau
+## Niedrig — Polish + Markdown-Ausbau
 
 ### Hero + Stats in Collections holen
 
-Beide aktuell als hartcodierte Komponenten (`src/components/Hero.astro`, `src/components/Stats.astro`). Wenn Tagline/Mitgliederzahlen pflegbar werden sollen:
+Beide sind aktuell hartcodierte Komponenten (`src/components/Hero.astro`, `src/components/Stats.astro`). Wenn pflegbar:
 
 - [ ] **Hero:** neue Section `src/content/sections/hero.md` mit `title`, `subtitle`, `cta1`, `cta2`. Hero-Komponente liest daraus.
 - [ ] **Stats:** entweder neue Collection `src/data/stats.json` (4 Eintraege: Jahre, Mitglieder, Trainings, LLSP) — oder Stats-Block ins Frontmatter einer Section.
@@ -71,12 +57,13 @@ Beide aktuell als hartcodierte Komponenten (`src/components/Hero.astro`, `src/co
 
 - [ ] `data-target`-Attribute liegen brach. Entweder Counter-JS im BaseLayout schreiben (IntersectionObserver + numerischer Zaehler) oder Attribute entfernen.
 
+### `verein.json` weiter nutzen
+
+- [ ] BaseLayout-JSON-LD (`SportsClub`-Strukturdaten) liest aktuell hartcodiert Vereinsname, Adresse, E-Mail. Sollte aus `verein.json` kommen. Adress-Aenderung wuerde sonst dort verfehlt.
+
 ### Inline-Styles in CSS-Klassen ziehen
 
-Die Komponenten `Veranstaltungen`, `Preise`, `Kontakt`, `Mitgliedschaften` haben noch viele `style="..."`-Attribute (1:1 aus dem Single-File-Entwurf).
-
-- [ ] Inline-Styles in CSS-Klassen ueberfuehren (entweder in `global.css` oder in `<style>`-Blocks der jeweiligen Komponente).
-- [ ] Inline-`onmouseover`/`onmouseout` in Mitgliedschaften.astro durch CSS-`:hover` ersetzen (teilweise erledigt).
+- [ ] In `Veranstaltungen`, `Preise`, `Kontakt`, `Mitgliedschaften` noch viele `style="..."`-Attribute (1:1 aus dem Single-File-Entwurf). Refactor in CSS-Klassen — nice-to-have.
 
 ### `.fade-in`-Animation
 
@@ -88,13 +75,35 @@ Die Komponenten `Veranstaltungen`, `Preise`, `Kontakt`, `Mitgliedschaften` haben
 
 ### View Transitions ausprobieren
 
-- [ ] `<ClientRouter />` einbauen (Astro v6) — smooth animierte Uebergaenge zwischen Detail-Seiten und One-Pager. Nice-to-have, kein Muss.
+- [ ] `<ClientRouter />` (Astro v6) — smooth animierte Uebergaenge zwischen Detail-Seiten und One-Pager. Nice-to-have, kein Muss.
+
+### Zod-Imports modernisieren
+
+- [ ] LSP zeigt `'z' is deprecated` (info-level) bei jedem Astro-Sync. Funktioniert weiter, aber sauberer: `import { z } from 'astro/zod'` statt `import { z } from 'astro:content'` in `content.config.ts`.
+
+### Gallery-Seite aus den neuen Bildern bauen
+
+- [ ] In `public/images/gallery/` liegen 5 Bilder (Bild-5-v, IMG_1070, Clubfahrt-2018, Home-1-b, Weihnachten-2019) + 1 Video. Aktuell ungenutzt. Idee: separate Galerie-Sektion oder Detail-Seite `/galerie`, die diese rendert (eigene Collection + Komponente).
 
 ---
 
 ## Erledigt (Referenz)
 
-Astro-Setup, Komponenten-Migration aus dem urspruenglichen Single-File-Entwurf, GitHub Pages-Deployment, Multi-Page-Architektur mit Detail-Seiten pro Sektion, vollstaendige Markdown/JSON-Pflege fuer alle Sektionen + Items, Icon-Komponenten mit Slug-Enum-Validierung, History API fuer teilbare URLs im One-Pager, Impressum (§ 5 TMG), Datenschutz (Vereins-Text Mai 2018), Legacy `index.html` entfernt, AGENTS.md / README.md als Onboarding-Doku.
+- Astro-Setup + komplette Komponenten-Migration aus dem urspruenglichen Single-File-Entwurf
+- GitHub Pages Deployment via `withastro/action@v6`
+- Multi-Page-Architektur (One-Pager `/` + 7 Detail-Seiten + Impressum + Datenschutz, gesamt 10 statische Pages)
+- Markdown/JSON-Pflege fuer alle Sektionen + Items (7 Collections + verein.json)
+- Icon-Komponenten mit Slug-Enum-Validierung
+- History API fuer teilbare URLs im One-Pager (pushState + replaceState + popstate)
+- Impressum (§ 5 TMG) + Datenschutz als `.astro`-Seiten mit dynamischen Vereins-/Vorstandsdaten
+- Klaro! Cookie-Consent (BSD-3, lokal gehostet, kein CDN-Call) mit Google Maps + Vereinsplaner als opt-in-Services
+- Google Fonts raus → Inter Variable lokal via `@fontsource-variable/inter`
+- Externe Bilder lokalisiert: Training-Bilder, OG-Image, Mitgliedschafts-Logos
+- `assetUrl()`-Helper fuer URL-Resolution (lokal vs. extern)
+- `verein.json` zentralisiert Vereinsstammdaten (Single Source of Truth)
+- Navbar auf Detail-Seiten immer solid (kein unsichtbares Logo)
+- Klaro-Theme an Site-Palette (gold/blau) angepasst, Banner unten links, kein Konflikt mit Back-to-Top
+- README.md / AGENTS.md / TODO.md als Onboarding-Doku, `index.html` entfernt
 
 ---
 
@@ -105,3 +114,5 @@ Astro-Setup, Komponenten-Migration aus dem urspruenglichen Single-File-Entwurf, 
 - [Astro Docs — Routing](https://docs.astro.build/en/guides/routing/)
 - [Astro Docs — Deploy to GitHub Pages](https://docs.astro.build/en/guides/deploy/github/)
 - [GitHub Docs — Custom Domains fuer Pages](https://docs.github.com/en/pages/configuring-a-custom-domain-for-your-github-pages-site)
+- [Klaro! Documentation](https://klaro.org/docs/integration/overview)
+- [Git LFS](https://git-lfs.github.com/) (fuer den Fall der grossen Videos)

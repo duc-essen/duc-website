@@ -24,7 +24,8 @@ Quick-Lookup. **Erste Anlaufstelle**, bevor du Code suchst.
 
 | Aenderung | Datei(en) |
 |---|---|
-| Vorstandsbesetzung | [`src/data/vorstand.json`](./src/data/vorstand.json) |
+| **Vereinsdaten** (Name, Anschrift, E-Mail, Registergericht/-nummer) | [`src/data/verein.json`](./src/data/verein.json) — wird in Footer + Impressum + Datenschutz gelesen |
+| Vorstandsbesetzung | [`src/data/vorstand.json`](./src/data/vorstand.json) — wird in Footer + Impressum gelesen |
 | Mitgliedsbeitraege (Preise) | [`src/data/preise.json`](./src/data/preise.json) |
 | Veranstaltung hinzufuegen / aendern | [`src/content/veranstaltungen/*.md`](./src/content/veranstaltungen/) (eine Datei pro Termin) |
 | Timeline-Eintrag (Geschichte) | [`src/content/geschichte/*.md`](./src/content/geschichte/) |
@@ -33,12 +34,15 @@ Quick-Lookup. **Erste Anlaufstelle**, bevor du Code suchst.
 | Section-Titel/Subtitle/Navbar-Label/CTA | [`src/content/sections/<slug>.md`](./src/content/sections/) (Frontmatter) |
 | Trainings-Adresse, Schedule, Bilder, Map | `src/content/sections/training.md` (Frontmatter `training:`) |
 | Kontaktdaten + Formular-URL | `src/content/sections/kontakt.md` (Frontmatter `kontakt:`) |
-| Impressum-Text | [`src/pages/impressum.astro`](./src/pages/impressum.astro) (Vorstand kommt aus `vorstand.json`) |
-| Datenschutz-Text | [`src/pages/datenschutz.md`](./src/pages/datenschutz.md) |
+| Impressum-Text | [`src/pages/impressum.astro`](./src/pages/impressum.astro) (Vorstand kommt aus `vorstand.json`, Adresse aus `verein.json`) |
+| Datenschutz-Text | [`src/pages/datenschutz.astro`](./src/pages/datenschutz.astro) (Adresse + E-Mail aus `verein.json`) |
 | Hero-Tagline | [`src/components/Hero.astro`](./src/components/Hero.astro) (hartcodiert) |
 | Stats-Zahlen (60 Jahre, 45 Mitglieder, ...) | [`src/components/Stats.astro`](./src/components/Stats.astro) (hartcodiert) |
+| **Cookie-Banner-Konfiguration** | [`public/klaro/klaro-config.js`](./public/klaro/klaro-config.js) (Services, deutsche Texte) |
+| Cookie-Banner-Styling | `src/styles/global.css` — Block „Klaro Privacy Manager – Theme" |
+| **Bilder/Medien** | [`public/images/`](./public/images/) — neue Bilder hier ablegen, im Markdown als `/images/...` referenzieren (`assetUrl()` macht den Rest) |
 | Globales Design / CSS | [`src/styles/global.css`](./src/styles/global.css) |
-| SEO `<head>`, JSON-LD, Favicon | [`src/layouts/BaseLayout.astro`](./src/layouts/BaseLayout.astro) |
+| SEO `<head>`, JSON-LD, Favicon, OG-Image | [`src/layouts/BaseLayout.astro`](./src/layouts/BaseLayout.astro) |
 | GitHub-Actions-Workflow | [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) |
 | Astro-Routing/Site/Base | [`astro.config.mjs`](./astro.config.mjs) |
 | Erlaubte Icon-Slugs erweitern | Schema in `content.config.ts` **und** entsprechende `*Icon.astro`-Komponente in [`src/components/icons/`](./src/components/icons/) |
@@ -96,9 +100,12 @@ Quick-Lookup. **Erste Anlaufstelle**, bevor du Code suchst.
 ## URL-/Routing-Modell
 
 - **`base: '/duc-website'`** in `astro.config.mjs`, weil Project-Site (kein User-Site-Repo). Alle Pfade haben dieses Prefix.
-- **`import.meta.env.BASE_URL`** ist im Build `'/duc-website'` (**ohne** trailing slash). Deshalb gibt es zwei Helper in [`src/utils/url.ts`](./src/utils/url.ts):
+- **`import.meta.env.BASE_URL`** ist im Build `'/duc-website'` (**ohne** trailing slash). Deshalb gibt es drei Helper in [`src/utils/url.ts`](./src/utils/url.ts):
   - `pathTo(slug)` — baut absolute Pfade wie `/duc-website/angebote` korrekt zusammen.
   - `ctaHref(href, isStandalone)` — loest CTA-Links kontextabhaengig auf: `#angebote` im One-Pager (smooth scroll), `/duc-website/angebote` auf Detail-Seite.
+  - `assetUrl(src)` — resolved Asset-Pfade. Externe URLs (`https://...`, `mailto:`, `data:`) werden durchgereicht, lokale Pfade (`/images/foo.jpg`) bekommen den Site-Base praefigiert (`/duc-website/images/foo.jpg`). Damit kann man im Markdown immer `/images/...` schreiben und der Helper macht den Rest.
+
+**Teilbare URLs im One-Pager (History API):** Beim Klick auf einen Section-Anchor (`#angebote`) auf `/` aktualisiert ein JS-Handler die URL via `history.pushState` auf `/duc-website/angebote`. Scroll-Spy synchronisiert URL passiv mit `replaceState`. Wer die URL teilt, landet auf der statischen Detail-Seite. Astro hat dafuer kein built-in Pattern — Plain JS in `BaseLayout.astro` ist der von der Doku empfohlene Weg.
 
 **`isStandalone`-Prop-Konvention:** jede Sektion-Komponente und die Navbar bekommen optional `isStandalone={true}`. Default ist `false` (One-Pager-Mode).
 - On `/` (One-Pager): `isStandalone=false`. Navbar nutzt Anchor-Links, CTAs scrollen.
@@ -167,8 +174,8 @@ order: number
 ```yaml
 name: string                        # CMAS, VDST, TSV NRW
 untertitel: string
-url: string (URL)
-logoUrl: string (URL)
+url: string                         # Web-URL zum Verband
+logoUrl: string                     # lokal "/images/mitgliedschaften/cmas.ico" oder externe URL
 order: number
 ```
 
@@ -177,6 +184,9 @@ JSON-Array, jedes Objekt: `{ id, rolle, name, order }`.
 
 ### `preise` (`src/data/preise.json`)
 JSON-Array, jedes Objekt: `{ id, gruppe, preis_monat, preis_quartal, icon: 'erwachsene'|'familie'|'jugend', order }`.
+
+### `verein` (`src/data/verein.json`) — kein Schema, direkter Import
+Einzelnes JSON-Objekt mit `name`, `shortName`, `anschrift {postfach, plzOrt, land}`, `email`, `emailDatenschutz`, `registergericht`, `registernummer`, `traegervereinHinweis`. Wird per `import verein from '../data/verein.json'` aus Footer, Impressum und Datenschutz gelesen. Single source of truth fuer Vereinsstammdaten.
 
 ---
 
@@ -216,8 +226,18 @@ Hartcodiert in eigenen Komponenten, **nicht** in sections-Collection. Stats wird
 ### Pages/Detail-Layout
 `src/pages/[slug].astro` macht `getStaticPaths` ueber alle sections-Eintraege. Standalone-Pages bekommen `padding-top: 6rem` damit Inhalt nicht hinter der Fixed-Navbar verschwindet.
 
-### Markdown-Pages (Impressum, Datenschutz)
-Astro-Markdown-Pages mit `layout: ../layouts/LegalLayout.astro` im Frontmatter. LegalLayout wrapped sie in BaseLayout + Navbar (standalone) + Container + Footer.
+### Impressum + Datenschutz (Astro-Pages)
+`src/pages/impressum.astro` und `src/pages/datenschutz.astro` nutzen `LegalLayout.astro` als Wrapper. Inhalte werden als HTML in Astro (nicht Markdown) geschrieben, damit dynamische Daten aus `verein.json` + `vorstand.json` per `getCollection`/`import` eingebunden werden koennen. **Adressaenderungen → `verein.json` editieren, beides spiegelt automatisch.**
+
+### Cookie-Banner (Klaro!)
+`public/klaro/klaro.js` (lokal gehostet, kein CDN-Call) + `public/klaro/klaro-config.js` definieren das Banner. In `BaseLayout.astro` werden beide per `<script is:inline defer>` eingebunden — Reihenfolge wichtig: Config zuerst, dann Klaro. Drittanbieter-Iframes (Google Maps in Training, Vereinsplaner in Kontakt) sind als `<iframe data-name="..." data-src="...">` markiert und werden nur nach Consent geladen. Theme (gold/blau) in `src/styles/global.css` unter „Klaro Privacy Manager – Theme". Footer hat einen „Cookie-Einstellungen"-Link der `klaro.show()` aufruft.
+
+**Neuen Drittanbieter-Service hinzufuegen:**
+1. In `klaro-config.js` einen neuen Eintrag in `services[]` mit eindeutigem `name` + deutscher Beschreibung in `translations.de` ergaenzen.
+2. Das einzubindende `<iframe>` oder `<script>` umstellen auf `<iframe data-name="<name>" data-src="...">` bzw. `<script type="text/plain" data-name="<name>" data-src="...">`.
+
+### Fonts
+**Keine Google-Fonts.** Inter Variable kommt als NPM-Paket `@fontsource-variable/inter` (SIL Open Font License, von Rasmus Andersson) und wird in `BaseLayout.astro` lokal importiert. Damit fliesst nichts an Google.
 
 ---
 
@@ -293,10 +313,8 @@ Wenn man trotzdem aufraeumen will: Zod-Import auf `import { z } from 'astro/zod'
 - **Hero + Stats** sind hartcodierte Komponenten — wenn Texte/Zahlen aktuell gehalten werden sollen, sollten sie auch in eine Collection wandern (siehe TODO.md).
 - **Inline-Styles** sind in vielen Komponenten noch reichlich vorhanden (1:1 aus dem Single-File-Entwurf uebernommen). Refactor in CSS-Klassen ist „nice to have", aber funktional irrelevant.
 - **Stats-Counter-Animation** (`data-target`-Attribut) wird im aktuellen JS nicht angesprochen — Zahlen sind statisch.
-- **Bilder auf Training-Seite** werden noch von `duc-essen.de/wp-content/...` geladen (extern). Falls die WordPress-Site abgeschaltet wird, brechen die Bilder. Sollte in `public/images/` migriert werden.
-- **Mitgliedschafts-Logos** kommen via Favicon-URL — wenn die Verbaende ihre Favicons aendern, brechen die Logos. Selbe Loesung: lokal in `public/` ziehen.
 - **`mitgliedschaften`** ist in der `sections`-Collection und hat eine eigene Detail-Seite, taucht aber bewusst nicht in der Navbar auf (`navLabel` ist nicht gesetzt). Wenn das doch erwuenscht ist: `navLabel: Mitgliedschaften` in `sections/mitgliedschaften.md` setzen.
-- **Datenschutz-Text** hat Stand Mai 2018 (uebernommen von duc-essen.de/datenschutzhinweise/). Erwaehnt „Real Cookie Banner" + funktionale Cookies, was im aktuellen Astro-Setup nicht zutrifft — sollte beim naechsten Datenschutz-Review angepasst werden.
+- **`widdauen-2023.mp4`** in `public/media/` ist 91 MB. Funktioniert (unter GitHubs 100-MB-Hard-Limit), aber das Repo waechst dauerhaft. Bei weiteren grossen Videos: Git LFS einrichten oder externes Hosting (z.B. tmhart.de wo das Video herkam) verwenden.
 
 ---
 
