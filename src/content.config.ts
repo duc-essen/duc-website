@@ -1,5 +1,6 @@
 import { defineCollection, z } from 'astro:content';
 import { glob, file } from 'astro/loaders';
+import { vereinsplanerLoader } from './loaders/vereinsplaner';
 
 // Sections: Metadaten + section-spezifische Strukturdaten pro Top-Level-Sektion.
 // Steuert sowohl den One-Pager (/) als auch die Detail-Seiten (/<slug>).
@@ -67,20 +68,19 @@ const mitgliedschaften = defineCollection({
   }),
 });
 
-// Veranstaltungen: 6+ Termine/Tipps, Hauptbeschreibung im Markdown-Body.
+// Veranstaltungen: kommen jetzt LIVE aus dem Vereinsplaner-iCal-Feed,
+// gefiltert nach oeffentlichen + zukuenftigen Events.
+// Der Vorstand pflegt im Vereinsplaner; Astro baut hier neu (siehe Cron in
+// .github/workflows/deploy.yml).
 const veranstaltungen = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/veranstaltungen' }),
+  loader: vereinsplanerLoader(),
   schema: z.object({
-    titel: z.string(),
-    untertitel: z.string(),
-    badge_text: z.string(),
-    badge_style: z.enum(['gold', 'blue']).default('gold'),
-    icon: z.enum(['calendar', 'ship', 'video', 'goggles', 'pool', 'waves']),
-    infos: z
-      .array(z.object({ label: z.string(), wert: z.string() }))
-      .default([]),
-    link: z.object({ text: z.string(), url: z.string().url() }).optional(),
-    order: z.number(),
+    summary: z.string(),
+    start: z.date(),
+    end: z.date().optional(),
+    location: z.string().optional(),
+    description: z.string().default(''),
+    url: z.string().url().optional(),
   }),
 });
 

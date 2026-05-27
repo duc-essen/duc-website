@@ -1,5 +1,5 @@
 ---
-import { getCollection, render } from 'astro:content';
+import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
 import EventIcon from './icons/EventIcon.astro';
 
@@ -10,11 +10,58 @@ interface Props {
 const { section } = Astro.props;
 
 const entries = (await getCollection('veranstaltungen')).sort(
-  (a, b) => a.data.order - b.data.order
+  (a, b) => a.data.start.getTime() - b.data.start.getTime()
 );
-const rendered = await Promise.all(
-  entries.map(async (entry) => ({ entry, Content: (await render(entry)).Content }))
-);
+
+// Icon-Slug aus dem SUMMARY raten — Fallback "calendar".
+type EventIconName = 'calendar' | 'ship' | 'video' | 'goggles' | 'pool' | 'waves';
+function guessIcon(summary: string): EventIconName {
+  const s = summary.toLowerCase();
+  if (/mare|mont|pool|stammt/.test(s)) return 'pool';
+  if (/antauch|tauch|see|freiwasser/.test(s)) return 'waves';
+  if (/film|kino|video|tour/.test(s)) return 'video';
+  if (/boot|messe|schiff/.test(s)) return 'ship';
+  if (/apnoe|frei|tauch/.test(s)) return 'goggles';
+  return 'calendar';
+}
+
+// Datum formatieren: "Fr. 20. März 2026 · 19:00".
+const wochentag = new Intl.DateTimeFormat('de-DE', { weekday: 'short' });
+const datumLong = new Intl.DateTimeFormat('de-DE', {
+  day: '2-digit',
+  month: 'long',
+  year: 'numeric',
+});
+const uhrzeit = new Intl.DateTimeFormat('de-DE', {
+  hour: '2-digit',
+  minute: '2-digit',
+});
+
+function formatBadge(start: Date): string {
+  return `${wochentag.format(start)}, ${datumLong.format(start)}`;
+}
+function formatDatum(start: Date, end?: Date): string {
+  const d = datumLong.format(start);
+  if (!end) return d;
+  const sameDay =
+    start.toDateString() === end.toDateString();
+  if (!sameDay) return d;
+  return `${d}, ${uhrzeit.format(start)}–${uhrzeit.format(end)} Uhr`;
+}
+
+// Beschreibung: erste Zeile als Untertitel verwenden wenn knapp, sonst kompletter Body.
+function splitDescription(desc: string): { untertitel: string; body: string } {
+  const lines = desc
+    .split(/\r?\n/)
+    .map((l) => l.trim())
+    .filter(Boolean);
+  if (lines.length === 0) return { untertitel: '', body: '' };
+  const first = lines[0];
+  if (lines.length === 1 || first.length < 80) {
+    return { untertitel: first, body: lines.slice(1).join('\n\n') };
+  }
+  return { untertitel: '', body: desc };
+}
 ---
 <section class="veranstaltungen" id={section.id} style="background: var(--white);">
   <div class="section-title">
@@ -22,33 +69,47 @@ const rendered = await Promise.all(
     {section.data.subtitle && <p>{section.data.subtitle}</p>}
   </div>
   <div style="max-width: 1100px; margin: 0 auto;">
-    <div class="features-grid">
-      {rendered.map(({ entry, Content }) => (
-        <div class="feature-card fade-in" style="text-align: left; border-top: 4px solid var(--gold);">
-          <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
-            <EventIcon name={entry.data.icon} />
-            <span class={`event-badge event-badge-${entry.data.badge_style}`}>{entry.data.badge_text}</span>
-          </div>
-          <h3 style="color: var(--blue); margin-bottom: 0.5rem;">{entry.data.titel}</h3>
-          <p style="color: var(--gold); font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem;">{entry.data.untertitel}</p>
-          <div class="event-description"><Content /></div>
-          {entry.data.infos.length > 0 && (
-            <div class="event-infos">
-              {entry.data.infos.map((info, i) => (
-                <p style={i > 0 ? 'margin-top: 0.5rem;' : undefined}>
-                  <strong>{info.label}:</strong> <Fragment set:html={info.wert} />
+    {entries.length === 0 ? (
+      <p class="no-events">
+        Aktuell sind keine öffentlichen Termine eingetragen. Schau in
+        Kürze wieder vorbei oder sprich uns direkt an.
+      </p>
+    ) : (
+      <div class="features-grid">
+        {entries.map((entry) => {
+          const icon = guessIcon(entry.data.summary);
+          const { untertitel, body } = splitDescription(entry.data.description);
+          return (
+            <div class="feature-card fade-in" style="text-align: left; border-top: 4px solid var(--gold);">
+              <div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 1rem;">
+                <EventIcon name={icon} />
+                <span class="event-badge event-badge-gold">{formatBadge(entry.data.start)}</span>
+              </div>
+              <h3 style="color: var(--blue); margin-bottom: 0.5rem;">{entry.data.summary}</h3>
+              {untertitel && (
+                <p style="color: var(--gold); font-weight: 600; font-size: 0.9rem; margin-bottom: 1rem;">
+                  {untertitel}
                 </p>
-              ))}
+              )}
+              {body && (
+                <div class="event-description" style="white-space: pre-line;">{body}</div>
+              )}
+              <div class="event-infos">
+                <p><strong>Datum:</strong> {formatDatum(entry.data.start, entry.data.end)}</p>
+                {entry.data.location && (
+                  <p style="margin-top: 0.5rem;"><strong>Ort:</strong> {entry.data.location}</p>
+                )}
+              </div>
+              {entry.data.url && (
+                <a href={entry.data.url} target="_blank" rel="noopener" class="btn btn-primary" style="width: 100%; justify-content: center;">
+                  Details in der Vereinsapp
+                </a>
+              )}
             </div>
-          )}
-          {entry.data.link && (
-            <a href={entry.data.link.url} target="_blank" class="btn btn-primary" style="width: 100%; justify-content: center;">
-              {entry.data.link.text}
-            </a>
-          )}
-        </div>
-      ))}
-    </div>
+          );
+        })}
+      </div>
+    )}
   </div>
 </section>
 
@@ -60,8 +121,15 @@ const rendered = await Promise.all(
     font-weight: 600;
   }
   .event-badge-gold { background: var(--gold); color: var(--blue-dark); }
-  .event-badge-blue { background: var(--blue); color: white; }
   .event-description { color: var(--gray); font-size: 0.95rem; margin-bottom: 1rem; }
   .event-description :global(p) { margin: 0 0 0.5rem; }
   .event-infos { background: var(--gray-light); padding: 1rem; border-radius: 10px; font-size: 0.9rem; }
+  .no-events {
+    text-align: center;
+    color: var(--gray);
+    font-size: 1.05rem;
+    padding: 3rem 1rem;
+    max-width: 600px;
+    margin: 0 auto;
+  }
 </style>

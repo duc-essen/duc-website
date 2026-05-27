@@ -1,6 +1,6 @@
 ---
-title: Veranstaltungen & Tipps
-subtitle: Spannende Events und Ausflugsziele für Taucher und Wassersportler
-navLabel: Events
+title: Bevorstehende Termine
+subtitle: Aktuelle Vereinstermine – direkt aus unserem Vereinsplaner
+navLabel: Termine
 order: 4
 ---

@@ -4,6 +4,10 @@ on:
   push:
     branches: [main]
   workflow_dispatch:
+  # Taegliches Rebuild, damit der Vereinsplaner-iCal-Feed
+  # neu geholt wird und die "Bevorstehende Termine"-Sektion aktuell bleibt.
+  schedule:
+    - cron: "0 4 * * *"  # 04:00 UTC = 05:00 CET / 06:00 CEST
 
 permissions:
   contents: read
