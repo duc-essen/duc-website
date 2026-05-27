@@ -1,7 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
-import PriceIcon from './icons/PriceIcon.astro';
+import Icon from './Icon.astro';
 import CtaButton from './CtaButton.astro';
 
 interface Props {
@@ -21,7 +21,7 @@ const preise = (await getCollection('preise')).sort((a, b) => a.data.order - b.d
     <div class="features-grid" style="margin-bottom: 3rem;">
       {preise.map((p) => (
         <div class="feature-card fade-in" style="text-align: center;">
-          <div style="margin-bottom: 1rem;"><PriceIcon name={p.data.icon} /></div>
+          <div style="margin-bottom: 1rem;"><Icon catalog="price" name={p.data.icon} /></div>
           <h3 style="color: var(--blue);">{p.data.gruppe}</h3>
           <p style="font-size: 2.5rem; font-weight: 800; color: var(--blue); margin: 1rem 0;">{p.data.preis_monat}</p>
           <p style="color: var(--gray);">pro Monat</p>

@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import KontaktIcon from './icons/KontaktIcon.astro';
+import Icon from './Icon.astro';
 
 interface Props {
   section: CollectionEntry<'sections'>;
@@ -25,7 +25,7 @@ const k = section.data.kontakt;
       <h3>So erreichst du uns</h3>
       {k.items.map((item) => (
         <div class="contact-item">
-          <div class="contact-item-icon"><KontaktIcon name={item.icon} /></div>
+          <div class="contact-item-icon"><Icon catalog="kontakt" name={item.icon} /></div>
           <div class="contact-item-text">
             <h4>{item.label}</h4>
             {item.label === 'E-Mail' ? (

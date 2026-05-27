@@ -1,0 +1,30 @@
+---
+import { ICON_SVGS, type IconCatalog } from './icons';
+
+/**
+ * Generische Icon-Komponente.
+ *
+ * Beispiel:
+ *   <Icon catalog="angebot" name="freitauchen" />
+ *
+ * Slug-Listen + Typen stehen in src/types/icons.ts und sind ueber das
+ * Zod-Schema in content.config.ts validiert. TypeScript pruegt, dass nur
+ * Catalog-Name-Kombinationen genutzt werden, die in der Map existieren.
+ */
+interface Props {
+  catalog: IconCatalog;
+  name: string;
+}
+const { catalog, name } = Astro.props;
+
+const catalogMap = ICON_SVGS[catalog] as Record<string, string>;
+const svg = catalogMap[name];
+
+if (!svg) {
+  throw new Error(
+    `Icon "${name}" existiert nicht im Katalog "${catalog}". ` +
+      `Erlaubte Werte siehe src/types/icons.ts.`
+  );
+}
+---
+<Fragment set:html={svg} />

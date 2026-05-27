@@ -1,7 +1,7 @@
 ---
 import { getCollection, render } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
-import AngebotIcon from './icons/AngebotIcon.astro';
+import Icon from './Icon.astro';
 import CtaButton from './CtaButton.astro';
 
 interface Props {
@@ -25,7 +25,7 @@ const rendered = await Promise.all(
   <div class="features-grid">
     {rendered.map(({ entry, Content }) => (
       <div class="feature-card fade-in">
-        <div class="feature-icon"><AngebotIcon name={entry.data.icon} /></div>
+        <div class="feature-icon"><Icon catalog="angebot" name={entry.data.icon} /></div>
         <h3>{entry.data.titel}</h3>
         <div class="card-text"><Content /></div>
       </div>

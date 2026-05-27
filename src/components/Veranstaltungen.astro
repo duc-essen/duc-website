@@ -1,8 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
-import EventIcon from './icons/EventIcon.astro';
-import type { EventIconName } from '../types/icons';
 
 interface Props {
   section: CollectionEntry<'sections'>;
@@ -30,17 +28,6 @@ if (fillCount > 0) {
   for (const entry of vergangene.slice(0, fillCount)) {
     termine.push({ entry, isPast: true });
   }
-}
-
-// Icon-Slug aus dem SUMMARY raten.
-function guessIcon(summary: string): EventIconName {
-  const s = summary.toLowerCase();
-  if (/mare|mont|stammt/.test(s)) return 'pool';
-  if (/antauch|see|freiwasser/.test(s)) return 'waves';
-  if (/film|kino|video|tour/.test(s)) return 'video';
-  if (/boot|messe|schiff/.test(s)) return 'ship';
-  if (/apnoe|frei|tauch|training/.test(s)) return 'goggles';
-  return 'calendar';
 }
 
 // Datum/Uhrzeit auf Deutsch.
