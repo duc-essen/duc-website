@@ -100,9 +100,9 @@ import Icon from './Icon.astro';
 
 ---
 
-## 🟠 3. SectionRenderer: Map statt if/else
+## ✅ 3. SectionRenderer: Map statt if/else — ERLEDIGT
 
-**Befund:** `SectionRenderer.astro` hat 7 `{section.id === '…' && <…>}`-Zeilen.
+**Befund (vorher):** `SectionRenderer.astro` hatte 7 `{section.id === '…' && <…>}`-Zeilen.
 
 **Vorher:**
 ```astro

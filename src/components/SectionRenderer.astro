@@ -8,16 +8,35 @@ import Preise from './Preise.astro';
 import Kontakt from './Kontakt.astro';
 import Mitgliedschaften from './Mitgliedschaften.astro';
 
+/**
+ * Dispatch-Map: section.id → konkrete Komponente.
+ * Wenn du eine neue Sektion hinzufuegst, hier einen Eintrag ergaenzen.
+ */
+const COMPONENTS = {
+  angebote: Angebote,
+  training: Training,
+  geschichte: Geschichte,
+  veranstaltungen: Veranstaltungen,
+  preise: Preise,
+  kontakt: Kontakt,
+  mitgliedschaften: Mitgliedschaften,
+} as const;
+
+type SectionId = keyof typeof COMPONENTS;
+
 interface Props {
   section: CollectionEntry<'sections'>;
   isStandalone?: boolean;
 }
 const { section, isStandalone = false } = Astro.props;
+
+const Component = COMPONENTS[section.id as SectionId];
+
+if (!Component) {
+  throw new Error(
+    `SectionRenderer: keine Komponente fuer section.id="${section.id}" registriert. ` +
+      `Ergaenze SectionRenderer.astro um einen Eintrag in COMPONENTS.`
+  );
+}
 ---
-{section.id === 'angebote' && <Angebote section={section} isStandalone={isStandalone} />}
-{section.id === 'training' && <Training section={section} isStandalone={isStandalone} />}
-{section.id === 'geschichte' && <Geschichte section={section} isStandalone={isStandalone} />}
-{section.id === 'veranstaltungen' && <Veranstaltungen section={section} isStandalone={isStandalone} />}
-{section.id === 'preise' && <Preise section={section} isStandalone={isStandalone} />}
-{section.id === 'kontakt' && <Kontakt section={section} isStandalone={isStandalone} />}
-{section.id === 'mitgliedschaften' && <Mitgliedschaften section={section} isStandalone={isStandalone} />}
+<Component section={section} isStandalone={isStandalone} />

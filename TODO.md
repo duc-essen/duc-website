@@ -84,6 +84,7 @@ Pakete:
 
 ## Erledigt (Referenz)
 
+- **SectionRenderer auf Map-Dispatch** umgestellt (statt 7 if/else-Zeilen ein typsicheres COMPONENTS-Mapping). Bei unbekannter section.id wirft die Komponente einen klaren Error mit Hinweis was zu tun ist.
 - **Hero (Titel + Tagline + CTAs)** liest aus `src/data/hero.json`. Damit ist kein Inhalt mehr hartcodiert ausser den Bubbles im BaseLayout.
 - **JSON-LD `SportsClub`** liest jetzt komplett aus `verein.json` (Name, Adresse, Geo, Sportarten, VDST-Mitgliedschaft, Trainingszeiten). Single source of truth funktioniert auch fuer Strukturdaten.
 - **Sitemap + robots.txt** via `@astrojs/sitemap` — `sitemap-index.xml`, `sitemap-0.xml` und Alias `sitemap.xml` (via Custom Astro-Integration in `astro.config.mjs`).
