@@ -75,6 +75,8 @@ Alle 10 Punkte aus [REFACTOR.md](./REFACTOR.md) sind erledigt. Codebase ist refa
 
 ## Erledigt (Referenz)
 
+- **GitHub-Org-Profil** auf [github.com/duc-essen](https://github.com/duc-essen) angelegt — eigenes `duc-essen/.github`-Repo mit `profile/README.md` (Vereins-Beschreibung, Trainingszeiten, Repo-Liste, Mitgliedschaften, Recht-Links).
+- **AI-Agent-Workflow** explizit in AGENTS.md + README dokumentiert: konkrete Beispielanweisungen die Mitglieder dem Agenten geben koennen, „Was der Agent NICHT machen soll", Sanity-Net via Build-Validation.
 - **Astro `<Image />` fuer Trainings-Bilder:** 3 Bilder von `public/` nach `src/assets/` migriert, Komponente nutzt `import.meta.glob` + `<Image widths=... format="webp" />`. Build erzeugt automatisch 3 responsive WebP-Varianten pro Bild, ~50-60% kleiner.
 - **global.css modularisiert:** Klaro-Theme, Animations und A11y in separate `_*.css` ausgelagert. global.css schrumpft von 1257 auf 927 Zeilen.
 - **BaseLayout aufgeteilt:** SeoHead, Bubbles, BackToTop als eigene Komponenten, Inline-Scripts in `src/scripts/layout.ts`. BaseLayout von 263 auf 45 Zeilen. Bubbles per Astro-Loop + CSS-Variablen statt 10 hartcodierte Divs.
