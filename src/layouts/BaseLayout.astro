@@ -128,10 +128,21 @@ const ogImage = 'https://duc-essen.de/wp-content/uploads/2024/02/Home-1-b.jpg';
       </svg>
     </button>
 
-    <script>
+    <script define:vars={{ baseUrl: import.meta.env.BASE_URL }}>
       // Current Year
       const yearEl = document.getElementById('currentYear');
       if (yearEl) yearEl.textContent = String(new Date().getFullYear());
+
+      // Sind wir auf dem One-Pager (/) — oder auf einer Detail-Seite?
+      const basePath = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
+      const isOnePager =
+        window.location.pathname === basePath ||
+        window.location.pathname === basePath + '/';
+
+      function urlForSlug(slug) {
+        if (!slug || slug === 'home') return basePath + '/';
+        return basePath + '/' + slug;
+      }
 
       // Mobile Menu Toggle
       const menuToggle = document.getElementById('menuToggle');
@@ -166,35 +177,60 @@ const ogImage = 'https://duc-essen.de/wp-content/uploads/2024/02/Home-1-b.jpg';
       );
       document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
 
-      // Smooth scroll for anchors
+      // Smooth scroll for anchors + pushState fuer teilbare URLs.
+      // Auf One-Pager: Klick auf #angebote scrollt + setzt URL zu /<base>/angebote.
+      // Refresh auf /<base>/angebote laedt dann die Detail-Seite (statische Route).
       document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
         anchor.addEventListener('click', (e) => {
-          const href = (anchor as HTMLAnchorElement).getAttribute('href');
-          if (!href || href === '#') return;
+          const href = anchor.getAttribute('href');
+          if (!href || href === '#' || href === '#main-content') return;
           const target = document.querySelector(href);
-          if (target) {
-            e.preventDefault();
-            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (!target) return;
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (isOnePager) {
+            const slug = href.substring(1);
+            history.pushState({ slug }, '', urlForSlug(slug));
           }
         });
       });
 
-      // Active menu item on scroll
-      const sections = document.querySelectorAll<HTMLElement>('section[id]');
-      const navLinksAll = document.querySelectorAll<HTMLAnchorElement>('.nav-links a[href^="#"]');
+      // Back/Forward-Button: zur passenden Section scrollen.
+      window.addEventListener('popstate', () => {
+        if (!isOnePager) return;
+        const rest = window.location.pathname.replace(basePath, '').replace(/^\/+|\/+$/g, '');
+        if (!rest) {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        } else {
+          const target = document.getElementById(rest);
+          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+
+      // Active menu item on scroll + URL-Sync (replaceState, kein History-Spam).
+      const sections = document.querySelectorAll('section[id]');
+      const navLinksAll = document.querySelectorAll('.nav-links a[href^="#"]');
+      let lastUrlSlug = '';
       const updateActive = () => {
         const scrollPos = window.scrollY + 150;
+        let currentSlug = '';
         sections.forEach((section) => {
           const top = section.offsetTop;
           const h = section.offsetHeight;
-          const id = section.getAttribute('id');
+          const id = section.getAttribute('id') || '';
           if (scrollPos >= top && scrollPos < top + h) {
+            currentSlug = id;
             navLinksAll.forEach((link) => {
               link.classList.remove('active');
               if (link.getAttribute('href') === '#' + id) link.classList.add('active');
             });
           }
         });
+        // Bei Scroll nur URL synchronisieren (kein neuer History-Eintrag).
+        if (isOnePager && currentSlug && currentSlug !== lastUrlSlug) {
+          lastUrlSlug = currentSlug;
+          history.replaceState(null, '', urlForSlug(currentSlug));
+        }
       };
       window.addEventListener('scroll', updateActive);
       updateActive();
