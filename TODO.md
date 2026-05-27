@@ -52,12 +52,6 @@ Pakete:
 
 ## Niedrig — Polish + Markdown-Ausbau
 
-### Hero in Collection holen
-
-Hero ist aktuell hartcodiert in `src/components/Hero.astro` (Headline, Subtitle, zwei CTA-Buttons).
-
-- [ ] Neue Section `src/content/sections/hero.md` mit `title`, `subtitle`, `cta1`, `cta2`. Hero-Komponente liest daraus.
-
 ### Stats-Counter-Animation
 
 - [ ] Aktuell statische Zahlen. Optional: IntersectionObserver-basierter Counter (Animation von 0 bis Zielwert beim Scrollen in den Viewport). `Stats.astro` muesste `target`-Feld aus Schema unterstuetzen und JS im BaseLayout erweitern.
@@ -90,6 +84,7 @@ Hero ist aktuell hartcodiert in `src/components/Hero.astro` (Headline, Subtitle,
 
 ## Erledigt (Referenz)
 
+- **Hero (Titel + Tagline + CTAs)** liest aus `src/data/hero.json`. Damit ist kein Inhalt mehr hartcodiert ausser den Bubbles im BaseLayout.
 - **JSON-LD `SportsClub`** liest jetzt komplett aus `verein.json` (Name, Adresse, Geo, Sportarten, VDST-Mitgliedschaft, Trainingszeiten). Single source of truth funktioniert auch fuer Strukturdaten.
 - **Sitemap + robots.txt** via `@astrojs/sitemap` — `sitemap-index.xml`, `sitemap-0.xml` und Alias `sitemap.xml` (via Custom Astro-Integration in `astro.config.mjs`).
 - **Stats sind aus `src/data/stats.json` pflegbar** (vorher hartcodiert).

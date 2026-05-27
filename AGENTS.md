@@ -36,7 +36,7 @@ Quick-Lookup. **Erste Anlaufstelle**, bevor du Code suchst.
 | Kontaktdaten + Formular-URL | `src/content/sections/kontakt.md` (Frontmatter `kontakt:`) |
 | Impressum-Text | [`src/pages/impressum.astro`](./src/pages/impressum.astro) (Vorstand kommt aus `vorstand.json`, Adresse aus `verein.json`) |
 | Datenschutz-Text | [`src/pages/datenschutz.astro`](./src/pages/datenschutz.astro) (Adresse + E-Mail aus `verein.json`) |
-| Hero-Tagline | [`src/components/Hero.astro`](./src/components/Hero.astro) (hartcodiert) |
+| Hero (Titel, Tagline, beide CTA-Buttons) | [`src/data/hero.json`](./src/data/hero.json) |
 | Stats-Zahlen (60 Jahre, 45 Mitglieder, ...) | [`src/data/stats.json`](./src/data/stats.json) |
 | **Cookie-Banner-Konfiguration** | [`public/klaro/klaro-config.js`](./public/klaro/klaro-config.js) (Services, deutsche Texte) |
 | Cookie-Banner-Styling | `src/styles/global.css` — Block „Klaro Privacy Manager – Theme" |
@@ -356,7 +356,7 @@ Wenn man trotzdem aufraeumen will: Zod-Import auf `import { z } from 'astro/zod'
 
 ## Known Limitations / Kleine Schulden
 
-- **Hero** ist eine hartcodierte Komponente — wenn die Tagline pflegbar werden soll, in eine Section/Collection ziehen (siehe TODO.md).
+- **Bubbles im BaseLayout** (10× `<div class="bubble">`) sind hartcodiert + 10 `:nth-child` CSS-Regeln. Sollte als Astro-Loop refaktoriert werden (siehe [REFACTOR.md](./REFACTOR.md) Punkt 6).
 - **Inline-Styles** sind in vielen Komponenten noch reichlich vorhanden (1:1 aus dem Single-File-Entwurf uebernommen). Refactor in CSS-Klassen ist „nice to have", aber funktional irrelevant.
 - **Stats-Counter-Animation** (`data-target`-Attribut) wird im aktuellen JS nicht angesprochen — Zahlen sind statisch.
 - **`mitgliedschaften`** ist in der `sections`-Collection und hat eine eigene Detail-Seite, taucht aber bewusst nicht in der Navbar auf (`navLabel` ist nicht gesetzt). Wenn das doch erwuenscht ist: `navLabel: Mitgliedschaften` in `sections/mitgliedschaften.md` setzen.
