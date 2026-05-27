@@ -1241,6 +1241,11 @@
             background: var(--gold) !important;
             color: var(--blue-dark) !important;
         }
+        /* "Immer"-Button (cm-btn-success-var) ist im Klaro-Default gruen — secondary blau. */
+        .klaro .cm-btn-success-var {
+            background: var(--blue-light) !important;
+            color: var(--white) !important;
+        }
         .klaro .cm-as-context-notice .cm-btn-accept,
         .klaro .cm-as-context-notice .cm-btn-accept-all {
             background: var(--blue-light) !important;
