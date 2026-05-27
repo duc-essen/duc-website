@@ -1,0 +1,141 @@
+        /* ========================================================
+           Klaro Privacy Manager – Theme passend zur DUC-Site
+           (blau #004F9E + gold #FFD400, Default-Klaro-Gruen weg).
+           ======================================================== */
+
+        /* Banner unten links statt rechts — sonst kollidiert es mit
+           dem Back-to-Top-Button rechts unten. */
+        .klaro .cookie-notice:not(.cookie-modal-notice) {
+            right: auto !important;
+            left: 20px !important;
+            bottom: 20px !important;
+            max-width: 420px;
+            background: var(--blue-dark) !important;
+            color: var(--white) !important;
+            border-radius: 14px !important;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Modal (Detail-Einstellungen) */
+        .klaro .cookie-modal .cm-modal {
+            background: var(--blue-dark) !important;
+            color: var(--white) !important;
+            border-radius: 16px !important;
+        }
+        .klaro .cookie-modal .cm-header h1,
+        .klaro .cookie-modal .cm-body h2,
+        .klaro .cookie-modal .cm-list-label,
+        .klaro .cookie-notice .cn-title,
+        .klaro .cookie-notice strong {
+            color: var(--gold) !important;
+        }
+
+        /* Buttons */
+        .klaro .cm-btn {
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            padding: 0.6rem 1.4rem !important;
+            transition: all 0.2s ease !important;
+        }
+        .klaro .cm-btn.cm-btn-success,
+        .klaro .cm-btn.cm-btn-accept-all {
+            background: var(--gold) !important;
+            color: var(--blue-dark) !important;
+        }
+        .klaro .cm-btn.cm-btn-success:hover,
+        .klaro .cm-btn.cm-btn-accept-all:hover {
+            background: #ffdd33 !important;
+        }
+        .klaro .cm-btn.cm-btn-accept {
+            background: var(--blue-light) !important;
+            color: var(--white) !important;
+        }
+        .klaro .cm-btn.cm-btn-decline {
+            background: transparent !important;
+            color: var(--white) !important;
+            border: 2px solid rgba(255, 255, 255, 0.4) !important;
+        }
+        .klaro .cm-btn.cm-btn-decline:hover {
+            background: rgba(255, 255, 255, 0.1) !important;
+        }
+
+        /* Toggle-Switches: deutlicher Kontrast auf dem dunklen Modal-Hintergrund.
+           Unchecked = heller transparenter Track + weisser Knopf.
+           Checked   = gold Track + dunkelblauer Knopf. */
+        .klaro .cm-list-input + .cm-list-label .slider {
+            background: rgba(255, 255, 255, 0.25) !important;
+            border: 2px solid rgba(255, 255, 255, 0.55) !important;
+            box-sizing: content-box !important;
+        }
+        .klaro .cm-list-input + .cm-list-label .slider::before {
+            background: #ffffff !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+        }
+        .klaro .cm-list-input:checked + .cm-list-label .slider {
+            background: var(--gold) !important;
+            border-color: var(--gold) !important;
+        }
+        .klaro .cm-list-input:checked + .cm-list-label .slider::before {
+            background: var(--blue-dark) !important;
+        }
+        /* Focus-Ring fuer Tastatur-Navigation */
+        .klaro .cm-list-input:focus-visible + .cm-list-label .slider {
+            outline: 3px solid var(--gold) !important;
+            outline-offset: 3px !important;
+        }
+
+        /* Links */
+        .klaro .cookie-modal a,
+        .klaro .cookie-notice a {
+            color: var(--gold) !important;
+        }
+
+        /* Inline-Placeholder fuer geblockte Iframes (Maps / Vereinsplaner) */
+        .klaro .cm-as-context-notice {
+            background: var(--gray-light) !important;
+            border: 1px dashed var(--blue) !important;
+            color: var(--blue-dark) !important;
+            padding: 2rem !important;
+            border-radius: 12px !important;
+            text-align: center !important;
+        }
+        /* Default fuer ALLE Buttons im Inline-Placeholder — kein Klaro-Default-Gruen mehr.
+           "Ja" → gold (primary call-to-action).
+           "Immer" → hellblau (secondary). */
+        .klaro .cm-as-context-notice button {
+            border: none !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            padding: 0.5rem 1.2rem !important;
+            margin: 0 0.25rem !important;
+            cursor: pointer !important;
+            transition: filter 0.2s ease !important;
+        }
+        .klaro .cm-as-context-notice button:hover {
+            filter: brightness(1.08) !important;
+        }
+        .klaro .cm-as-context-notice .cm-btn-success {
+            background: var(--gold) !important;
+            color: var(--blue-dark) !important;
+        }
+        /* "Immer"-Button (cm-btn-success-var) ist im Klaro-Default gruen — secondary blau. */
+        .klaro .cm-btn-success-var {
+            background: var(--blue-light) !important;
+            color: var(--white) !important;
+        }
+        .klaro .cm-as-context-notice .cm-btn-accept,
+        .klaro .cm-as-context-notice .cm-btn-accept-all {
+            background: var(--blue-light) !important;
+            color: var(--white) !important;
+        }
+        .klaro .cm-as-context-notice .cm-btn-decline {
+            background: transparent !important;
+            color: var(--blue-dark) !important;
+            border: 2px solid var(--blue) !important;
+        }
+
+        /* Back-to-Top in den Hintergrund schicken solange Banner offen ist */
+        body.klaro-notice-open .back-to-top {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
