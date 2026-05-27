@@ -80,6 +80,9 @@ Pakete:
 
 ## Erledigt (Referenz)
 
+- **Astro `<Image />` fuer Trainings-Bilder:** 3 Bilder von `public/` nach `src/assets/` migriert, Komponente nutzt `import.meta.glob` + `<Image widths=... format="webp" />`. Build erzeugt automatisch 3 responsive WebP-Varianten pro Bild, ~50-60% kleiner.
+- **global.css modularisiert:** Klaro-Theme, Animations und A11y in separate `_*.css` ausgelagert. global.css schrumpft von 1257 auf 927 Zeilen.
+- **BaseLayout aufgeteilt:** SeoHead, Bubbles, BackToTop als eigene Komponenten, Inline-Scripts in `src/scripts/layout.ts`. BaseLayout von 263 auf 45 Zeilen. Bubbles per Astro-Loop + CSS-Variablen statt 10 hartcodierte Divs.
 - **Inline-Styles eliminiert:** 36 `style="..."`-Attribute aus 9 Komponenten in scoped `<style>`-Bloecke ueberfuehrt. Markup ist jetzt sauber, dev-tools-friendly.
 - **Icon-System konsolidiert:** Slug-Enums in `src/types/icons.ts`, alle SVGs in `src/components/icons.ts` (Map), eine generische `Icon.astro` ersetzt 5 spezialisierte Icon-Komponenten. ~110 Zeilen Duplikation entfernt.
 - **Non-Null-Assertions** in Training/Kontakt durch defensive Checks ersetzt — bei falscher Verkabelung schlaegt der Build mit klarer Meldung fehl statt zur Render-Zeit mit „undefined is not an object".

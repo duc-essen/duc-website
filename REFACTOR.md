@@ -194,7 +194,7 @@ icon: z.enum(ANGEBOT_ICONS),
 
 ---
 
-## 🟡 6. BaseLayout.astro aufteilen
+## ✅ 6. BaseLayout.astro aufteilen — ERLEDIGT
 
 **Befund:** `BaseLayout.astro` ist 260+ Zeilen mit **drei** Verantwortungen vermischt:
 
@@ -234,7 +234,7 @@ CSS reduziert sich von 10 :nth-child-Regeln auf eine Regel mit Custom-Properties
 
 ---
 
-## 🟡 7. global.css modularisieren
+## ✅ 7. global.css modularisieren — ERLEDIGT
 
 **Befund:** 1200+ Zeilen in einer Datei. Alles vermischt: Reset, Typography, Hero, Navbar, Section-Layout, Animation, Klaro-Theme, Print-Rules.
 
@@ -256,7 +256,7 @@ Build-Bundle bleibt identisch (Vite resolved/bundlet); aber „wo ist diese Hove
 
 ---
 
-## 🟢 8. Astro `<Image />` einsetzen
+## ✅ 8. Astro `<Image />` einsetzen — ERLEDIGT
 
 **Befund:** Trainings-Bilder und Mitgliedschafts-Logos werden mit `<img>` + `loading="lazy"` eingebunden — kein AVIF/WebP, kein responsive `srcset`, keine Format-Auswahl.
 
