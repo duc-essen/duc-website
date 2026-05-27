@@ -84,6 +84,7 @@ Pakete:
 
 ## Erledigt (Referenz)
 
+- **Icon-System konsolidiert:** Slug-Enums in `src/types/icons.ts`, alle SVGs in `src/components/icons.ts` (Map), eine generische `Icon.astro` ersetzt 5 spezialisierte Icon-Komponenten. ~110 Zeilen Duplikation entfernt.
 - **Non-Null-Assertions** in Training/Kontakt durch defensive Checks ersetzt — bei falscher Verkabelung schlaegt der Build mit klarer Meldung fehl statt zur Render-Zeit mit „undefined is not an object".
 - **`<CtaButton />`-Komponente** ersetzt alle 6 direkten `<a class="btn btn-primary">`-Stellen in Hero, Angebote, Training, Geschichte, Preise. Inklusive ctaHref()-Logik intern, externe URLs (http/mailto/tel) werden 1:1 durchgereicht.
 - **SectionRenderer auf Map-Dispatch** umgestellt (statt 7 if/else-Zeilen ein typsicheres COMPONENTS-Mapping). Bei unbekannter section.id wirft die Komponente einen klaren Error mit Hinweis was zu tun ist.

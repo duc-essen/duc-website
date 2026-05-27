@@ -64,7 +64,7 @@ Seit der ersten Review zwischendurch erledigt: **Stats-Daten** sind jetzt in `sr
 
 ---
 
-## 🟠 2. Icon-Komponenten generalisieren
+## ✅ 2. Icon-Komponenten generalisieren — ERLEDIGT
 
 **Befund:** 5 Icon-Komponenten mit identischem Pattern, ~110 Zeilen Duplikation:
 - `src/components/icons/AngebotIcon.astro` (6 Slugs)
@@ -281,6 +281,12 @@ import { Image } from 'astro:assets';
 **Voraussetzung:** Bilder muessen in `src/assets/` liegen (nicht `public/`), damit Astro sie zum Build-Zeitpunkt verarbeiten kann. → Migration der bereits lokal vorhandenen Files.
 
 **Gewinn:** Lighthouse-Score, mobile Ladezeit, deutlich kleinere Bilder ohne Qualitaetsverlust.
+
+---
+
+## ✅ 5. Icon-Enums zentralisieren — ERLEDIGT
+
+In `src/types/icons.ts` zentralisiert (ANGEBOT_ICONS, TIMELINE_ICONS, PRICE_ICONS, EVENT_ICONS, KONTAKT_ICONS als `const` arrays mit zugehoerigen Types). `content.config.ts` nutzt sie in den zod-Schemas; alte Icon-Komponenten lesen ihre Typen daraus. Single source of truth.
 
 ---
 

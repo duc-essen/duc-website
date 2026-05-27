@@ -214,13 +214,13 @@ Einzelnes JSON-Objekt, single source of truth fuer Vereinsstammdaten. Wird per `
 
 ## Wenn du eine neue Icon-Variante brauchst
 
-Icons sind nicht beliebig — sie sind als Slug-Enum im Schema validiert und gemappt in `src/components/icons/<X>Icon.astro`. Um z.B. einen neuen Angebot-Icon `unterwasserhockey` hinzuzufuegen:
+Icons sind als Slug-Enum im Schema validiert und alle in einer zentralen SVG-Map definiert. Um z.B. einen neuen Angebot-Icon `unterwasserhockey` hinzuzufuegen:
 
-1. In [`src/content.config.ts`](./src/content.config.ts) den `z.enum([...])` der entsprechenden Collection erweitern.
-2. In [`src/components/icons/AngebotIcon.astro`](./src/components/icons/AngebotIcon.astro) (oder dem passenden) einen neuen `{name === 'unterwasserhockey' && (<svg>...)}`-Block hinzufuegen.
+1. In [`src/types/icons.ts`](./src/types/icons.ts) den `ANGEBOT_ICONS`-Array um `'unterwasserhockey'` ergaenzen.
+2. In [`src/components/icons.ts`](./src/components/icons.ts) im `ICON_SVGS.angebot`-Objekt einen Eintrag `unterwasserhockey: '<svg ...>...</svg>'` hinzufuegen.
 3. Im Markdown `icon: unterwasserhockey` setzen.
 
-Reihenfolge ist wichtig: Schema zuerst, sonst Build-Fehler im Markdown.
+`content.config.ts` und `src/components/Icon.astro` werden automatisch typsicher — TypeScript pruegt, dass das Schema und die SVG-Map konsistent sind. Bei fehlendem SVG schlaegt der Build mit klarer Meldung fehl.
 
 ---
 
