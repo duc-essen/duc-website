@@ -44,6 +44,17 @@ Der Text ist beim Umzug auf Astro + Klaro durchstrukturiert worden (Cookies-Sekt
 
 ---
 
+## Refactor-Backlog (separates Doku-Dokument)
+
+Eine systematische Code-Review hat 10 Refactor-Vorschlaege identifiziert (Inline-Styles, Icon-Komponenten generalisieren, BaseLayout aufteilen, etc.) — mit Aufwandsschaetzungen und Code-Beispielen. Siehe **[REFACTOR.md](./REFACTOR.md)**.
+
+Pakete:
+- **Quick Wins** (~1 h): SectionRenderer-Map, CtaButton-Komponente, Non-Null-Assertions, JSON-LD aus verein.json
+- **Tiefes Aufraeumen** (~3 h): + Inline-Styles, Icon-Generalisierung, Icon-Enums, CSS-Module
+- **Komplettpaket** (~5 h): + BaseLayout-Split, Astro `<Image />`
+
+---
+
 ## Niedrig — Polish + Markdown-Ausbau
 
 ### Hero + Stats in Collections holen
