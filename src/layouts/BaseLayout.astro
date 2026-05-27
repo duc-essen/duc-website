@@ -4,7 +4,9 @@ import '../styles/global.css';
 // unabhaengig vom Google-Oekosystem. Kein CDN-Call zu Drittanbietern.
 import '@fontsource-variable/inter';
 import { pathTo } from '../utils/url';
-import verein from '../data/verein.json';
+import SeoHead from '../components/SeoHead.astro';
+import Bubbles from '../components/Bubbles.astro';
+import BackToTop from '../components/BackToTop.astro';
 
 interface Props {
   title?: string;
@@ -15,89 +17,12 @@ const {
   title = 'DUC Essen - Deutscher Unterwasserclub Essen e.V.',
   description = 'DUC Essen - Dein Verein für Tauchen, Apnoe, Freediving und Flossenschwimmen in Essen. Training Di 20:00 & Do 20:15 im Stadtbad Nord-Ost. Kostenloses Probetraining!',
 } = Astro.props;
-
-const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-// OG-Image lokal (kein externer Hotlink). Astro.site liefert die absolute Basis-URL.
-const ogImage = new URL(pathTo('images/og/og-image.jpg'), Astro.site).toString();
 ---
 
 <!DOCTYPE html>
 <html lang="de">
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>{title}</title>
-
-    <!-- SEO Meta Tags -->
-    <meta name="description" content={description} />
-    <meta
-      name="keywords"
-      content="Tauchverein Essen, DUC Essen, Apnoe Essen, Freediving Essen, Flossenschwimmen, Unterwasserclub, Tauchen lernen Essen, VDST"
-    />
-    <meta name="author" content="Deutscher Unterwasserclub Essen e.V." />
-    <meta name="robots" content="index, follow" />
-    <link rel="canonical" href={canonical} />
-
-    <!-- Open Graph -->
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonical} />
-    <meta property="og:title" content={title} />
-    <meta property="og:description" content="Tauchen, Apnoe, Freediving und Flossenschwimmen in Essen. Kostenloses Probetraining jeden Dienstag und Donnerstag!" />
-    <meta property="og:image" content={ogImage} />
-    <meta property="og:locale" content="de_DE" />
-    <meta property="og:site_name" content="DUC Essen" />
-
-    <!-- Twitter Card -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content={title} />
-    <meta name="twitter:description" content="Tauchen, Apnoe, Freediving und Flossenschwimmen in Essen. Kostenloses Probetraining!" />
-    <meta name="twitter:image" content={ogImage} />
-
-    <!-- Structured Data / JSON-LD — alle Werte aus src/data/verein.json. -->
-    <script type="application/ld+json" set:html={JSON.stringify({
-      '@context': 'https://schema.org',
-      '@type': 'SportsClub',
-      name: verein.name,
-      alternateName: verein.shortName,
-      url: verein.webUrl,
-      logo: ogImage,
-      description: verein.description,
-      address: {
-        '@type': 'PostalAddress',
-        streetAddress: verein.trainingStandort.strasse,
-        addressLocality: verein.trainingStandort.ort,
-        postalCode: verein.trainingStandort.plz,
-        addressCountry: 'DE',
-      },
-      geo: {
-        '@type': 'GeoCoordinates',
-        latitude: verein.trainingStandort.lat,
-        longitude: verein.trainingStandort.lng,
-      },
-      email: verein.emailDatenschutz,
-      sport: verein.sportarten,
-      memberOf: {
-        '@type': 'Organization',
-        name: verein.verband.name,
-        alternateName: verein.verband.kuerzel,
-      },
-      openingHoursSpecification: verein.trainingszeiten.map((t) => ({
-        '@type': 'OpeningHoursSpecification',
-        dayOfWeek: t.wochentag,
-        opens: t.von,
-        closes: t.bis,
-      })),
-    })} />
-
-    <!-- Favicon -->
-    <link
-      rel="icon"
-      type="image/svg+xml"
-      href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='45' fill='%23004F9E'/><circle cx='50' cy='50' r='35' fill='%23FFD400'/><text x='50' y='62' font-size='32' font-weight='bold' text-anchor='middle' fill='%23004F9E'>DUC</text></svg>"
-    />
-
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#004F9E" />
+    <SeoHead title={title} description={description} />
 
     <!--
       Klaro Privacy Manager — Cookie/Consent-Banner.
@@ -108,156 +33,14 @@ const ogImage = new URL(pathTo('images/og/og-image.jpg'), Astro.site).toString()
     <script is:inline defer data-config="klaroConfig" src={pathTo('klaro/klaro.js')}></script>
   </head>
   <body>
-    <!-- Skip Link -->
     <a href="#main-content" class="skip-link">Zum Hauptinhalt springen</a>
-
-    <!-- Animated Bubbles Background -->
-    <div class="bubbles" aria-hidden="true">
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-      <div class="bubble"></div>
-    </div>
-
+    <Bubbles />
     <slot />
+    <BackToTop />
 
-    <!-- Back to Top Button -->
-    <button id="backToTop" class="back-to-top" aria-label="Nach oben scrollen">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-        <polyline points="18 15 12 9 6 15"></polyline>
-      </svg>
-    </button>
-
-    <script define:vars={{ baseUrl: import.meta.env.BASE_URL }}>
-      // Current Year
-      const yearEl = document.getElementById('currentYear');
-      if (yearEl) yearEl.textContent = String(new Date().getFullYear());
-
-      // Sind wir auf dem One-Pager (/) — oder auf einer Detail-Seite?
-      const basePath = baseUrl.endsWith('/') ? baseUrl.slice(0, -1) : baseUrl;
-      const isOnePager =
-        window.location.pathname === basePath ||
-        window.location.pathname === basePath + '/';
-
-      function urlForSlug(slug) {
-        if (!slug || slug === 'home') return basePath + '/';
-        return basePath + '/' + slug;
-      }
-
-      // Mobile Menu Toggle
-      const menuToggle = document.getElementById('menuToggle');
-      const navLinks = document.getElementById('navLinks');
-      if (menuToggle && navLinks) {
-        menuToggle.addEventListener('click', () => {
-          navLinks.classList.toggle('active');
-        });
-        document.querySelectorAll('.nav-links a').forEach((link) => {
-          link.addEventListener('click', () => navLinks.classList.remove('active'));
-        });
-      }
-
-      // Navbar scroll effect. Auf Detail-Seiten (!isOnePager) bleibt die
-      // Navbar immer „scrolled" — sonst waere sie transparent vor weissem
-      // Hintergrund und das Logo wuerde verschwinden.
-      const navbar = document.getElementById('navbar');
-      const onScroll = () => {
-        if (!navbar) return;
-        if (!isOnePager) {
-          navbar.classList.add('scrolled');
-          return;
-        }
-        if (window.scrollY > 100) navbar.classList.add('scrolled');
-        else navbar.classList.remove('scrolled');
-      };
-      window.addEventListener('scroll', onScroll);
-      onScroll();
-
-      // Scroll animations (fade-in)
-      const observer = new IntersectionObserver(
-        (entries) => {
-          entries.forEach((entry) => {
-            if (entry.isIntersecting) entry.target.classList.add('visible');
-          });
-        },
-        { threshold: 0.1, rootMargin: '0px 0px -50px 0px' }
-      );
-      document.querySelectorAll('.fade-in').forEach((el) => observer.observe(el));
-
-      // Smooth scroll for anchors + pushState fuer teilbare URLs.
-      // Auf One-Pager: Klick auf #angebote scrollt + setzt URL zu /<base>/angebote.
-      // Refresh auf /<base>/angebote laedt dann die Detail-Seite (statische Route).
-      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
-        anchor.addEventListener('click', (e) => {
-          const href = anchor.getAttribute('href');
-          if (!href || href === '#' || href === '#main-content') return;
-          const target = document.querySelector(href);
-          if (!target) return;
-          e.preventDefault();
-          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          if (isOnePager) {
-            const slug = href.substring(1);
-            history.pushState({ slug }, '', urlForSlug(slug));
-          }
-        });
-      });
-
-      // Back/Forward-Button: zur passenden Section scrollen.
-      window.addEventListener('popstate', () => {
-        if (!isOnePager) return;
-        const rest = window.location.pathname.replace(basePath, '').replace(/^\/+|\/+$/g, '');
-        if (!rest) {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        } else {
-          const target = document.getElementById(rest);
-          if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-        }
-      });
-
-      // Active menu item on scroll + URL-Sync (replaceState, kein History-Spam).
-      const sections = document.querySelectorAll('section[id]');
-      const navLinksAll = document.querySelectorAll('.nav-links a[href^="#"]');
-      let lastUrlSlug = '';
-      const updateActive = () => {
-        const scrollPos = window.scrollY + 150;
-        let currentSlug = '';
-        sections.forEach((section) => {
-          const top = section.offsetTop;
-          const h = section.offsetHeight;
-          const id = section.getAttribute('id') || '';
-          if (scrollPos >= top && scrollPos < top + h) {
-            currentSlug = id;
-            navLinksAll.forEach((link) => {
-              link.classList.remove('active');
-              if (link.getAttribute('href') === '#' + id) link.classList.add('active');
-            });
-          }
-        });
-        // Bei Scroll nur URL synchronisieren (kein neuer History-Eintrag).
-        if (isOnePager && currentSlug && currentSlug !== lastUrlSlug) {
-          lastUrlSlug = currentSlug;
-          history.replaceState(null, '', urlForSlug(currentSlug));
-        }
-      };
-      window.addEventListener('scroll', updateActive);
-      updateActive();
-
-      // Back to Top
-      const backToTop = document.getElementById('backToTop');
-      if (backToTop) {
-        window.addEventListener('scroll', () => {
-          if (window.scrollY > 500) backToTop.classList.add('visible');
-          else backToTop.classList.remove('visible');
-        });
-        backToTop.addEventListener('click', () => {
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-      }
+    <script>
+      import { initLayout } from '../scripts/layout';
+      initLayout();
     </script>
   </body>
 </html>

@@ -1,0 +1,102 @@
+---
+import { pathTo } from '../utils/url';
+import verein from '../data/verein.json';
+
+/**
+ * Vollstaendiger SEO-Head:
+ * - Title + Meta Description + Keywords + Robots
+ * - Canonical
+ * - Open Graph + Twitter Card
+ * - JSON-LD `SportsClub` (alle Werte aus verein.json)
+ * - Favicon (inline SVG)
+ * - Theme Color
+ *
+ * Wird aus BaseLayout.astro eingebunden.
+ */
+interface Props {
+  title: string;
+  description: string;
+}
+const { title, description } = Astro.props;
+
+const canonical = new URL(Astro.url.pathname, Astro.site).toString();
+const ogImage = new URL(pathTo('images/og/og-image.jpg'), Astro.site).toString();
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'SportsClub',
+  name: verein.name,
+  alternateName: verein.shortName,
+  url: verein.webUrl,
+  logo: ogImage,
+  description: verein.description,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: verein.trainingStandort.strasse,
+    addressLocality: verein.trainingStandort.ort,
+    postalCode: verein.trainingStandort.plz,
+    addressCountry: 'DE',
+  },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: verein.trainingStandort.lat,
+    longitude: verein.trainingStandort.lng,
+  },
+  email: verein.emailDatenschutz,
+  sport: verein.sportarten,
+  memberOf: {
+    '@type': 'Organization',
+    name: verein.verband.name,
+    alternateName: verein.verband.kuerzel,
+  },
+  openingHoursSpecification: verein.trainingszeiten.map((t) => ({
+    '@type': 'OpeningHoursSpecification',
+    dayOfWeek: t.wochentag,
+    opens: t.von,
+    closes: t.bis,
+  })),
+};
+
+const faviconSvg =
+  "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'>" +
+  "<circle cx='50' cy='50' r='45' fill='%23004F9E'/>" +
+  "<circle cx='50' cy='50' r='35' fill='%23FFD400'/>" +
+  "<text x='50' y='62' font-size='32' font-weight='bold' text-anchor='middle' fill='%23004F9E'>DUC</text>" +
+  '</svg>';
+---
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>{title}</title>
+
+<meta name="description" content={description} />
+<meta
+  name="keywords"
+  content="Tauchverein Essen, DUC Essen, Apnoe Essen, Freediving Essen, Flossenschwimmen, Unterwasserclub, Tauchen lernen Essen, VDST"
+/>
+<meta name="author" content={verein.name} />
+<meta name="robots" content="index, follow" />
+<link rel="canonical" href={canonical} />
+
+<!-- Open Graph -->
+<meta property="og:type" content="website" />
+<meta property="og:url" content={canonical} />
+<meta property="og:title" content={title} />
+<meta property="og:description" content="Tauchen, Apnoe, Freediving und Flossenschwimmen in Essen. Kostenloses Probetraining jeden Dienstag und Donnerstag!" />
+<meta property="og:image" content={ogImage} />
+<meta property="og:locale" content="de_DE" />
+<meta property="og:site_name" content={verein.shortName} />
+
+<!-- Twitter Card -->
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content={title} />
+<meta name="twitter:description" content="Tauchen, Apnoe, Freediving und Flossenschwimmen in Essen. Kostenloses Probetraining!" />
+<meta name="twitter:image" content={ogImage} />
+
+<!-- Structured Data / JSON-LD (SportsClub) -->
+<script type="application/ld+json" set:html={JSON.stringify(jsonLd)} />
+
+<!-- Favicon (inline SVG, blau-gold DUC-Wort) -->
+<link rel="icon" type="image/svg+xml" href={faviconSvg} />
+
+<!-- Theme Color -->
+<meta name="theme-color" content="#004F9E" />
