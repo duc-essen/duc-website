@@ -19,7 +19,8 @@ const sections = defineCollection({
         ort: z.string(),
         beschreibung: z.string(),
         schedule: z.array(z.object({ tag: z.string(), zeit: z.string() })),
-        bilder: z.array(z.object({ url: z.string().url(), alt: z.string() })),
+        // url kann lokal ("/images/...") oder extern ("https://...") sein.
+        bilder: z.array(z.object({ url: z.string(), alt: z.string() })),
         mapEmbedUrl: z.string().url(),
       })
       .optional(),
@@ -60,7 +61,8 @@ const mitgliedschaften = defineCollection({
     name: z.string(),
     untertitel: z.string(),
     url: z.string().url(),
-    logoUrl: z.string().url(),
+    // logoUrl kann lokal ("/images/...") oder extern ("https://...") sein.
+    logoUrl: z.string(),
     order: z.number(),
   }),
 });

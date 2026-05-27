@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import type { CollectionEntry } from 'astro:content';
+import { assetUrl } from '../utils/url';
 
 interface Props {
   section: CollectionEntry<'sections'>;
@@ -26,7 +27,7 @@ const items = (await getCollection('mitgliedschaften')).sort(
       >
         <div style="background: white; padding: 1.5rem 2rem; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; min-width: 200px;">
           <img
-            src={item.data.logoUrl}
+            src={assetUrl(item.data.logoUrl)}
             alt={item.data.name}
             style="height: 40px; width: auto; max-width: 80px; margin-bottom: 0.5rem; object-fit: contain;"
           />

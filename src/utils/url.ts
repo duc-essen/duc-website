@@ -31,3 +31,16 @@ export function ctaHref(
   const slug = href.replace(/^[#/]+/, '');
   return isStandalone ? pathTo(slug) : `#${slug}`;
 }
+
+/**
+ * Loest einen Asset-Pfad (Bild, Logo, etc.) so auf, dass externe URLs
+ * (http/https/data) durchgereicht werden, lokale Pfade aber mit dem Site-Base
+ * praefixiert werden. Damit kann man im Markdown "/images/foo.jpg" schreiben
+ * und es funktioniert sowohl auf `/duc-website/...` als auch spaeter auf einer
+ * Custom Domain (`/...`).
+ */
+export function assetUrl(src: string): string {
+  if (/^(https?:|data:|mailto:)/.test(src)) return src;
+  const clean = src.startsWith('/') ? src.slice(1) : src;
+  return pathTo(clean);
+}

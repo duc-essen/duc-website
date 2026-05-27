@@ -1,27 +1,28 @@
 ---
 import LegalLayout from '../layouts/LegalLayout.astro';
 import { getCollection } from 'astro:content';
+import verein from '../data/verein.json';
 
 const vorstand = (await getCollection('vorstand')).sort(
   (a, b) => a.data.order - b.data.order
 );
+const ersteVorsitzende = vorstand.find((p) => p.id === 'vorsitzende');
 
 const title = 'Impressum';
-const description =
-  'Impressum und Anbieterkennzeichnung gemäß § 5 TMG des Deutschen Unterwasserclub Essen e.V.';
+const description = `Impressum und Anbieterkennzeichnung gemäß § 5 TMG des ${verein.name}.`;
 ---
 <LegalLayout title={title} frontmatter={{ title, description }}>
   <h2>Angaben gemäß § 5 TMG</h2>
   <p>
-    <strong>Deutscher Unterwasserclub Essen e.V.</strong><br />
-    Postfach 34 01 51<br />
-    45073 Essen<br />
-    Deutschland
+    <strong>{verein.name}</strong><br />
+    {verein.anschrift.postfach}<br />
+    {verein.anschrift.plzOrt}<br />
+    {verein.anschrift.land}
   </p>
 
   <h2>Kontakt</h2>
   <p>
-    E-Mail: <a href="mailto:katharina@duc-essen.de">katharina@duc-essen.de</a>
+    E-Mail: <a href={`mailto:${verein.email}`}>{verein.email}</a>
   </p>
 
   <h2>Vertretungsberechtigter Vorstand</h2>
@@ -34,16 +35,16 @@ const description =
   <h2>Registereintrag</h2>
   <p>Eintragung im Vereinsregister.</p>
   <ul>
-    <li><strong>Registergericht:</strong> Amtsgericht Essen</li>
-    <li><strong>Registernummer:</strong> VR 1507</li>
+    <li><strong>Registergericht:</strong> {verein.registergericht}</li>
+    <li><strong>Registernummer:</strong> {verein.registernummer}</li>
   </ul>
 
   <h2>Verantwortlich für den Inhalt nach § 18 Abs. 2 MStV</h2>
   <p>
-    Katharina Sina<br />
-    c/o Deutscher Unterwasserclub Essen e.V.<br />
-    Postfach 34 01 51<br />
-    45073 Essen
+    {ersteVorsitzende?.data.name ?? '—'}<br />
+    c/o {verein.name}<br />
+    {verein.anschrift.postfach}<br />
+    {verein.anschrift.plzOrt}
   </p>
 
   <h2>Haftung für Inhalte</h2>

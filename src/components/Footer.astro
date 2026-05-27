@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import { pathTo } from '../utils/url';
+import verein from '../data/verein.json';
 
 const vorstand = (await getCollection('vorstand')).sort(
   (a, b) => a.data.order - b.data.order
@@ -12,9 +13,9 @@ const sections = (await getCollection('sections'))
 <footer>
   <div class="footer-content">
     <div class="footer-section">
-      <h4>DUC Essen</h4>
-      <p>Deutscher Unterwasserclub Essen e.V.<br>Trägerverein des Landesleistungsstützpunktes NRW für Freitauchen</p>
-      <p style="margin-top: 1rem;"><strong>Postanschrift:</strong><br>Postfach 34 01 51<br>45073 Essen</p>
+      <h4>{verein.shortName}</h4>
+      <p>{verein.name}<br>{verein.traegervereinHinweis}</p>
+      <p style="margin-top: 1rem;"><strong>Postanschrift:</strong><br>{verein.anschrift.postfach}<br>{verein.anschrift.plzOrt}</p>
     </div>
     <div class="footer-section">
       <h4>Vorstand</h4>
@@ -31,9 +32,9 @@ const sections = (await getCollection('sections'))
     </div>
     <div class="footer-section">
       <h4>Recht</h4>
-      <p>Deutscher Unterwasserclub Essen e.V.</p>
-      <p>Registergericht: Amtsgericht Essen</p>
-      <p>Registernummer: VR 1507</p>
+      <p>{verein.name}</p>
+      <p>Registergericht: {verein.registergericht}</p>
+      <p>Registernummer: {verein.registernummer}</p>
       <a href={pathTo('impressum')} style="margin-top: 1rem; display: inline-block;">Impressum</a>
       <a href={pathTo('datenschutz')} style="display: inline-block;">Datenschutz</a>
       <a

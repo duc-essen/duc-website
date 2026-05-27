@@ -16,7 +16,8 @@ const {
 } = Astro.props;
 
 const canonical = new URL(Astro.url.pathname, Astro.site).toString();
-const ogImage = 'https://duc-essen.de/wp-content/uploads/2024/02/Home-1-b.jpg';
+// OG-Image lokal (kein externer Hotlink). Astro.site liefert die absolute Basis-URL.
+const ogImage = new URL(pathTo('images/og/og-image.jpg'), Astro.site).toString();
 ---
 
 <!DOCTYPE html>
@@ -58,7 +59,7 @@ const ogImage = 'https://duc-essen.de/wp-content/uploads/2024/02/Home-1-b.jpg';
       name: 'Deutscher Unterwasserclub Essen e.V.',
       alternateName: 'DUC Essen',
       url: 'https://duc-essen.de',
-      logo: 'https://duc-essen.de/wp-content/uploads/2024/02/Home-1-b.jpg',
+      logo: ogImage,
       description: 'Tauchverein in Essen für Tauchen, Apnoe, Freediving und Flossenschwimmen. Mitglied im VDST.',
       address: {
         '@type': 'PostalAddress',

@@ -1,0 +1,14 @@
+{
+  "name": "Deutscher Unterwasserclub Essen e.V.",
+  "shortName": "DUC Essen",
+  "anschrift": {
+    "postfach": "Postfach 34 01 51",
+    "plzOrt": "45073 Essen",
+    "land": "Deutschland"
+  },
+  "email": "katharina@duc-essen.de",
+  "emailDatenschutz": "info@duc-essen.de",
+  "registergericht": "Amtsgericht Essen",
+  "registernummer": "VR 1507",
+  "traegervereinHinweis": "Trägerverein des Landesleistungsstützpunktes NRW für Freitauchen"
+}

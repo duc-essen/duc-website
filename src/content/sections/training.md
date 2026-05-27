@@ -15,11 +15,11 @@ training:
     - { tag: Dienstag,   zeit: "20:00 - 22:00 Uhr" }
     - { tag: Donnerstag, zeit: "20:15 - 22:00 Uhr" }
   bilder:
-    - url: https://duc-essen.de/wp-content/uploads/2024/02/Home-1-b.jpg
+    - url: /images/training/training-1.jpg
       alt: Taucher des DUC Essen beim Unterwassertraining im Schwimmbad
-    - url: https://duc-essen.de/wp-content/uploads/2025/03/IMG_2976.jpg
+    - url: /images/training/training-2.jpg
       alt: Vereinsmitglieder beim Apnoe-Training im Stadtbad Nord-Ost
-    - url: https://duc-essen.de/wp-content/uploads/2020/02/DUC-Training-Weihnachten-2019-5.Movie_Schnappschuss-1024x576.jpg
+    - url: /images/training/training-3.jpg
       alt: DUC Essen Weihnachts-Training 2019 mit Tauchern unter Wasser
   mapEmbedUrl: https://maps.google.com/maps?q=Schonnebeckh%C3%B6fe%2060%2C%2045309%20Essen&t=&z=15&ie=UTF8&iwloc=&output=embed
 ---

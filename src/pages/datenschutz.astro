@@ -1,0 +1,183 @@
+---
+import LegalLayout from '../layouts/LegalLayout.astro';
+import verein from '../data/verein.json';
+
+const title = 'Datenschutzerklärung';
+const description = `Datenschutzerklärung des ${verein.name} nach DSGVO.`;
+---
+<LegalLayout title={title} frontmatter={{ title, description }}>
+  <h2>1. Name und Kontaktdaten des für die Verarbeitung Verantwortlichen</h2>
+  <p>Diese Datenschutzinformation gilt für die Datenverarbeitung durch:</p>
+  <p>
+    <strong>Verantwortlicher:</strong> {verein.name}<br />
+    {verein.anschrift.postfach}<br />
+    {verein.anschrift.plzOrt}<br />
+    E-Mail: <a href={`mailto:${verein.emailDatenschutz}`}>{verein.emailDatenschutz}</a>
+  </p>
+
+  <h2>2. Erhebung und Speicherung personenbezogener Daten sowie Art und Zweck von deren Verwendung</h2>
+
+  <h3>a) Beim Besuch der Website</h3>
+  <p>
+    Beim Aufrufen unserer Website werden durch den von Ihnen benutzten Browser
+    automatisch Informationen an den Server unserer Website gesendet. Diese
+    Informationen werden temporär in einem sogenannten Logfile gespeichert.
+    Folgende Informationen werden dabei ohne Ihr Zutun erfasst und bis zur
+    automatisierten Löschung gespeichert:
+  </p>
+  <ul>
+    <li>IP-Adresse des anfragenden Rechners</li>
+    <li>Datum und Uhrzeit des Zugriffs</li>
+    <li>Name und URL der abgerufenen Datei</li>
+    <li>Website, von der aus der Zugriff erfolgt (Referrer-URL)</li>
+    <li>Verwendeter Browser und ggf. das Betriebssystem sowie der Name des Access-Providers</li>
+  </ul>
+  <p><strong>Verarbeitungszwecke:</strong></p>
+  <ul>
+    <li>Gewährleistung eines reibungslosen Verbindungsaufbaus</li>
+    <li>Gewährleistung einer komfortablen Nutzung</li>
+    <li>Auswertung der Systemsicherheit und -stabilität</li>
+    <li>Weitere administrative Zwecke</li>
+  </ul>
+  <p>
+    Die Rechtsgrundlage ist Artikel 6 Abs. 1 S. 1 lit. f) DSGVO (berechtigte
+    Interessen). Die Daten werden nicht zur Identifikation von Personen
+    verwendet.
+  </p>
+
+  <h3>b) Bei Nutzung des Kontaktformulars</h3>
+  <p>
+    Eine gültige E-Mail-Adresse ist erforderlich. Weitere Angaben sind
+    freiwillig. Die Datenverarbeitung erfolgt nach Artikel 6 Abs. 1 S. 1 lit. a)
+    DSGVO auf der Grundlage Ihrer freiwillig erteilten Einwilligung. Nach
+    Erledigung Ihrer Anfrage werden die Daten automatisch gelöscht.
+  </p>
+
+  <h2>3. Links auf Websites Dritter</h2>
+  <p>
+    Links werden sorgfältig recherchiert. Allerdings haben wir keinen Einfluss
+    auf die aktuelle und zukünftige Gestaltung und Inhalte der verlinkten
+    Seiten. Wir sind nicht für Inhalte verlinkter Seiten verantwortlich. Eine
+    Haftung ist ausgeschlossen, es sei denn, wir haben positive Kenntnis von
+    rechtswidrigen Inhalten und können deren Nutzung technisch verhindern.
+  </p>
+
+  <h2>4. Weitergabe von Daten</h2>
+  <p>Ihre Daten werden an Dritte weitergegeben nur wenn:</p>
+  <ul>
+    <li>Sie Ihre nach Artikel 6 Abs. 1 S. 1 lit. a) DSGVO ausdrückliche Einwilligung dazu erteilt haben</li>
+    <li>die Weitergabe gemäß Artikel 6 Abs. 1 S. 1 lit. f) DSGVO zur Geltendmachung von Rechtsansprüchen erforderlich ist und kein überwiegendes schutzwürdiges Interesse gegen die Weitergabe besteht</li>
+    <li>eine gesetzliche Verpflichtung nach Artikel 6 Abs. 1 S. 1 lit. c) DSGVO besteht</li>
+    <li>dies gemäß Artikel 6 Abs. 1 S. 1 lit. b) DSGVO für Vertragsverhältnisse erforderlich ist</li>
+  </ul>
+
+  <h2>5. Cookies und Einwilligungs-Management</h2>
+  <p>
+    Diese Website setzt von sich aus <strong>keine Tracking- oder
+    Marketing-Cookies</strong>. Statische Inhalte (Texte, Bilder, Schriftarten)
+    werden direkt von unserem Hosting (GitHub Pages) ausgeliefert.
+  </p>
+  <p>
+    <strong>Einwilligungs-Banner (Klaro!):</strong> Wir verwenden den
+    Open-Source-Consent-Manager <em>Klaro!</em> (KIProtect GmbH, Berlin,
+    BSD-3-Lizenz), um Ihre Einwilligung für externe Drittanbieter-Dienste
+    einzuholen. Klaro selbst speichert Ihre Auswahl in einem Cookie namens
+    <code>klaro-consent</code> (Laufzeit: 1 Jahr). Dieses Cookie ist technisch
+    notwendig, um Ihre Einstellungen zu merken, und überträgt
+    <strong>keine Daten an Dritte</strong>.
+  </p>
+  <p>
+    Ihre Einstellungen können Sie jederzeit über den Link „Cookie-Einstellungen"
+    im Footer ändern.
+  </p>
+
+  <h2>6. Verwendung von Google Maps</h2>
+  <p>
+    Auf der Trainingsseite zeigen wir optional eine Google-Maps-Karte mit
+    unserer Trainingsadresse. <strong>Google Maps wird erst geladen, wenn Sie
+    aktiv zustimmen</strong> — vorher findet keine Datenübertragung an Google
+    statt.
+  </p>
+  <p>
+    Wenn Sie der Einbindung zustimmen, wird die Karte direkt von Google-Servern
+    geladen. Dabei werden u.a. Ihre IP-Adresse, der verwendete Browser und
+    Referer-Daten an Google übertragen. Google Maps wird von Google Inc.,
+    1600 Amphitheatre Parkway, Mountain View, CA 94043, USA betrieben. Weitere
+    Informationen finden Sie in den
+    <a href="https://policies.google.com/privacy">Google-Datenschutzhinweisen</a>.
+  </p>
+
+  <h2>6a. Verwendung des Vereinsplaner-Formulars</h2>
+  <p>
+    Auf der Kontaktseite bieten wir ein Anmeldeformular über den Dienst
+    <em>Vereinsplaner</em> an. <strong>Auch dieses Formular wird erst nach Ihrer
+    Zustimmung geladen.</strong> Stimmen Sie zu, werden Ihre Eingaben an
+    Vereinsplaner übertragen und dort verarbeitet, damit wir Ihre Anfrage
+    bearbeiten können.
+  </p>
+
+  <h2>7. Betroffenenrechte</h2>
+  <p>Sie haben das Recht:</p>
+  <ul>
+    <li>gemäß Artikel 7 Abs. 3 DSGVO Ihre Einwilligung jederzeit zu widerrufen.</li>
+    <li>gemäß Artikel 15 DSGVO Auskunft über Ihre verarbeiteten personenbezogenen Daten zu verlangen (Verarbeitungszwecke, Kategorien, Empfänger, Speicherdauer, Berichtigungs- bzw. Löschungsrechte, Herkunft der Daten, automatisierte Entscheidungsfindung).</li>
+    <li>gemäß Artikel 16 DSGVO unverzüglich die Berichtigung unrichtiger oder Vervollständigung unvollständiger Daten zu verlangen.</li>
+    <li>gemäß Artikel 17 DSGVO die Löschung Ihrer Daten zu verlangen, soweit nicht die Verarbeitung zur Ausübung von Meinungsfreiheit, Erfüllung rechtlicher Verpflichtungen, öffentlichem Interesse oder Geltendmachung von Rechtsansprüchen erforderlich ist.</li>
+    <li>gemäß Artikel 18 DSGVO die Einschränkung der Verarbeitung zu verlangen unter bestimmten Bedingungen.</li>
+    <li>gemäß Artikel 20 DSGVO Ihre Daten in einem strukturierten, gängigen und maschinenlesbaren Format zu erhalten oder die Übermittlung an einen anderen Verantwortlichen zu verlangen.</li>
+    <li>gemäß Artikel 77 DSGVO sich bei einer Aufsichtsbehörde zu beschweren.</li>
+  </ul>
+
+  <h2>8. Widerspruchsrecht</h2>
+  <p>
+    Sofern Ihre Daten auf Grundlage berechtigter Interessen gemäß Artikel 6
+    Abs. 1 S. 1 lit. f) DSGVO verarbeitet werden, haben Sie das Recht, gemäß
+    Artikel 21 DSGVO Widerspruch einzulegen, soweit Gründe aus Ihrer besonderen
+    Situation vorliegen.
+  </p>
+  <p>
+    Widerspruch per E-Mail an:
+    <a href={`mailto:${verein.emailDatenschutz}`}>{verein.emailDatenschutz}</a>
+  </p>
+
+  <h2>9. Datensicherheit</h2>
+  <p>
+    Die Website verwendet SSL-Verfahren (Secure Socket Layer) mit der höchsten
+    vom Browser unterstützten Verschlüsselungsstufe (in der Regel 256 Bit,
+    ansonsten 128 Bit v3). Ein geschlossenes Schlüssel- bzw. Schlosssymbol zeigt
+    verschlüsselte Übertragung an.
+  </p>
+  <p>
+    Zusätzlich werden geeignete technische und organisatorische
+    Sicherheitsmaßnahmen zum Schutz vor Manipulation, Verlust, Zerstörung oder
+    unbefugtem Zugriff eingesetzt. Diese werden fortlaufend verbessert.
+  </p>
+
+  <h2>10. Aktualität und Änderung dieser Datenschutzerklärung</h2>
+  <p>
+    Diese Datenschutzerklärung ist aktuell gültig und hat den Stand Mai 2026
+    (überarbeitet im Zuge des Umzugs auf GitHub Pages und der Einführung des
+    Klaro-Einwilligungsmanagers).
+  </p>
+  <p>
+    Bei Weiterentwicklung unserer Website oder Änderung gesetzlicher Vorgaben
+    kann eine Anpassung notwendig werden. Die jeweils aktuelle Version kann
+    jederzeit auf der Webseite abgerufen und ausgedruckt werden.
+  </p>
+
+  <h2>11. Hosting</h2>
+  <p>
+    Diese Website wird über
+    <a href="https://pages.github.com/">GitHub Pages</a> (GitHub, Inc.,
+    88 Colin P Kelly Jr St, San Francisco, CA 94107, USA) ausgeliefert. Beim
+    Aufruf werden technisch notwendige Verbindungsdaten (siehe Abschnitt 2a)
+    durch GitHub verarbeitet. Details:
+    <a href="https://docs.github.com/en/site-policy/privacy-policies/github-privacy-statement">GitHub Privacy Statement</a>.
+  </p>
+  <p>
+    Die verwendete Schriftart <strong>Inter</strong> wird über das
+    Open-Source-Paket <a href="https://fontsource.org/">@fontsource</a> lokal von
+    unserem eigenen Server ausgeliefert — es findet keine Verbindung zu Google
+    Fonts oder anderen Drittanbietern statt.
+  </p>
+</LegalLayout>
