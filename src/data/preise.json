@@ -1,0 +1,26 @@
+[
+  {
+    "id": "erwachsene",
+    "gruppe": "Erwachsene",
+    "preis_monat": "8,50 €",
+    "preis_quartal": "25,50 €",
+    "icon": "erwachsene",
+    "order": 1
+  },
+  {
+    "id": "familie",
+    "gruppe": "Familienmitglieder",
+    "preis_monat": "7,50 €",
+    "preis_quartal": "22,50 €",
+    "icon": "familie",
+    "order": 2
+  },
+  {
+    "id": "jugendliche",
+    "gruppe": "Jugendliche",
+    "preis_monat": "5,00 €",
+    "preis_quartal": "15,00 €",
+    "icon": "jugend",
+    "order": 3
+  }
+]

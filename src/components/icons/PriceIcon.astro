@@ -1,0 +1,16 @@
+---
+type PriceIconName = 'erwachsene' | 'familie' | 'jugend';
+interface Props {
+  name: PriceIconName;
+}
+const { name } = Astro.props;
+---
+{name === 'erwachsene' && (
+  <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#004F9E" stroke-width="2"><circle cx="12" cy="7" r="4" fill="#FFD400"/><path d="M5.5 21c0-4.5 3-7 6.5-7s6.5 2.5 6.5 7"/></svg>
+)}
+{name === 'familie' && (
+  <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#004F9E" stroke-width="2"><circle cx="9" cy="7" r="3" fill="#FFD400"/><circle cx="17" cy="7" r="2.5" fill="#FFD400"/><path d="M3 21c0-3.5 2.5-5.5 5.5-5.5"/><path d="M21 21c0-3 2-4.5 0-4.5"/><path d="M9 15.5c2 0 4 1 5 3"/><circle cx="13" cy="11" r="2" fill="#FFD400"/><path d="M13 13c-2 0-3.5 1.5-3.5 4"/></svg>
+)}
+{name === 'jugend' && (
+  <svg viewBox="0 0 24 24" width="48" height="48" fill="none" stroke="#004F9E" stroke-width="2"><circle cx="12" cy="6" r="3" fill="#FFD400"/><path d="M7 21v-4c0-2.5 2-4 5-4s5 1.5 5 4v4"/><path d="M9 13l-1 8M15 13l1 8"/></svg>
+)}
