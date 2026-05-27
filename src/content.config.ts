@@ -85,6 +85,13 @@ const veranstaltungen = defineCollection({
   schema: eventSchema,
 });
 
+// Vergangene oeffentliche Termine — als Fallback, falls aktuell keine
+// zukuenftigen anstehen. Limit 4 (kompakter Rueckblick).
+const vergangeneTermine = defineCollection({
+  loader: vereinsplanerLoader({ mode: 'public-past', limit: 4 }),
+  schema: eventSchema,
+});
+
 // Trainings: die naechsten 6 Trainings-Einheiten (Titel beginnt mit "Training").
 const trainings = defineCollection({
   loader: vereinsplanerLoader({ mode: 'training', limit: 6 }),
@@ -130,6 +137,7 @@ export const collections = {
   angebote,
   mitgliedschaften,
   veranstaltungen,
+  'vergangene-termine': vergangeneTermine,
   trainings,
   geschichte,
   vorstand,

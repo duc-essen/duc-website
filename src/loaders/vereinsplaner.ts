@@ -24,22 +24,25 @@ interface VEvent {
   url?: string;
 }
 
+export type VereinsplanerLoaderMode = 'public' | 'public-past' | 'training';
+
 export interface VereinsplanerLoaderOptions {
   /**
-   * 'public'   → alle Vereinstermine ausser Trainings/Vorstand/Papnoe
-   * 'training' → ausschliesslich Trainings (Titel beginnt mit "Training")
+   * 'public'      → alle zukuenftigen Vereinstermine ausser Trainings/Vorstand/Papnoe
+   * 'public-past' → letzte vergangene oeffentliche Termine (sortiert neueste zuerst)
+   * 'training'    → ausschliesslich zukuenftige DUC-Trainings (kein TSV)
    */
-  mode: 'public' | 'training';
-  /** Maximale Anzahl an Eintraegen (sortiert nach Datum aufsteigend). */
+  mode: VereinsplanerLoaderMode;
+  /** Maximale Anzahl an Eintraegen. */
   limit?: number;
 }
 
-function matchesMode(summary: string, mode: 'public' | 'training'): boolean {
+function matchesTitle(summary: string, mode: VereinsplanerLoaderMode): boolean {
   if (mode === 'training') {
     // DUC-Trainings, aber keine TSV-Termine (TSV NRW ist eigener Verband)
     return /^training/i.test(summary) && !/\btsv\b/i.test(summary);
   }
-  // public: alles ausser interne Termine
+  // public + public-past: alles ausser interne Termine
   return (
     !/^training/i.test(summary) &&
     !/vorstand/i.test(summary) &&
@@ -71,12 +74,20 @@ export function vereinsplanerLoader(opts: VereinsplanerLoaderOptions): Loader {
       }
 
       const now = Date.now();
+      const isPast = opts.mode === 'public-past';
       let filtered = events
-        .filter((e) => e.start && new Date(e.start).getTime() > now)
-        .filter((e) => e.summary && matchesMode(e.summary, opts.mode))
-        .sort(
-          (a, b) => new Date(a.start!).getTime() - new Date(b.start!).getTime()
-        );
+        .filter((e) => {
+          if (!e.start) return false;
+          const ts = new Date(e.start).getTime();
+          return isPast ? ts <= now : ts > now;
+        })
+        .filter((e) => e.summary && matchesTitle(e.summary, opts.mode))
+        .sort((a, b) => {
+          const diff =
+            new Date(a.start!).getTime() - new Date(b.start!).getTime();
+          // public-past: neueste zuerst (absteigend)
+          return isPast ? -diff : diff;
+        });
 
       if (opts.limit !== undefined) {
         filtered = filtered.slice(0, opts.limit);
