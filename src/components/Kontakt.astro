@@ -7,7 +7,13 @@ interface Props {
   isStandalone?: boolean;
 }
 const { section } = Astro.props;
-const k = section.data.kontakt!;
+if (!section.data.kontakt) {
+  throw new Error(
+    `Section "${section.id}" wird mit der Kontakt-Komponente gerendert, ` +
+      `hat aber keinen "kontakt"-Frontmatter-Block in src/content/sections/${section.id}.md.`
+  );
+}
+const k = section.data.kontakt;
 ---
 <section class="contact" id={section.id}>
   <div class="section-title">

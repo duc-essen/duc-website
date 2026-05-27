@@ -9,7 +9,13 @@ interface Props {
 }
 const { section, isStandalone = false } = Astro.props;
 
-const t = section.data.training!;
+if (!section.data.training) {
+  throw new Error(
+    `Section "${section.id}" wird mit der Training-Komponente gerendert, ` +
+      `hat aber keinen "training"-Frontmatter-Block in src/content/sections/${section.id}.md.`
+  );
+}
+const t = section.data.training;
 ---
 <section class="training" id={section.id}>
   <div class="section-title">

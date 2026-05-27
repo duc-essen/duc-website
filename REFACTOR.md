@@ -284,23 +284,29 @@ import { Image } from 'astro:assets';
 
 ---
 
-## 🟢 9. Non-Null-Assertions abbauen
+## ✅ 9. Non-Null-Assertions abbauen — ERLEDIGT
 
-**Befund:**
+**Befund (vorher):**
 - `src/components/Kontakt.astro:10` — `const k = section.data.kontakt!;`
 - `src/components/Training.astro:10` — `const t = section.data.training!;`
 
-Wenn jemand die Section ohne diese Sub-Daten rendert → Runtime-Crash mit hauptschwer lesbarer Fehlermeldung.
+**Loesung:** Beide Stellen durch defensive Checks mit klarer Fehlermeldung ersetzt:
 
-**Vorschlag (defensive):**
 ```ts
 if (!section.data.training) {
-  throw new Error(`Section ${section.id} missing 'training' frontmatter block`);
+  throw new Error(
+    `Section "${section.id}" wird mit der Training-Komponente gerendert, ` +
+      `hat aber keinen "training"-Frontmatter-Block in src/content/sections/${section.id}.md.`
+  );
 }
 const t = section.data.training;
 ```
 
-**Saubererer (strukturell):** Zod `discriminatedUnion` in `content.config.ts`, sodass `training-section` ein eigener Sub-Typ ist und `section.data.training` zur Compile-Zeit garantiert vorhanden ist. Aufwand etwas hoeher, dafuer kein Runtime-Risk.
+Wenn die Komponente falsch verkabelt wird (z.B. SectionRenderer-Map zeigt training-Komponente auf eine Section ohne training-Block), schlaegt der **Build** mit klarer Meldung fehl, statt mit „undefined is not an object" zur Render-Zeit.
+
+**Verbleibende `!`-Assertions:** In `src/loaders/vereinsplaner.ts` gibt es `e.start!` / `e.summary!` (Zeilen 87, 102-103). Diese sind durch die direkt davor stehende `.filter(e => e.start && e.summary)`-Kette statisch sicher; TypeScript versteht das ohne Type-Predicate nicht von alleine. Saubererer Refactor moeglich mit `function isCompleteVEvent(e): e is CompleteVEvent { ... }`, aber funktional kein Risiko.
+
+**Saubererer Schritt (offen):** Zod `discriminatedUnion` in `content.config.ts`, sodass `training-section` ein eigener Sub-Typ ist und `section.data.training` zur Compile-Zeit garantiert vorhanden ist. Aufwand etwas hoeher, dafuer Compile-Time-Safety statt Runtime-Throw.
 
 ---
 
