@@ -1182,12 +1182,29 @@
             background: rgba(255, 255, 255, 0.1) !important;
         }
 
-        /* Toggle-Switches in der Detail-Liste */
+        /* Toggle-Switches: deutlicher Kontrast auf dem dunklen Modal-Hintergrund.
+           Unchecked = heller transparenter Track + weisser Knopf.
+           Checked   = gold Track + dunkelblauer Knopf. */
+        .klaro .cm-list-input + .cm-list-label .slider {
+            background: rgba(255, 255, 255, 0.25) !important;
+            border: 2px solid rgba(255, 255, 255, 0.55) !important;
+            box-sizing: content-box !important;
+        }
+        .klaro .cm-list-input + .cm-list-label .slider::before {
+            background: #ffffff !important;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3) !important;
+        }
         .klaro .cm-list-input:checked + .cm-list-label .slider {
             background: var(--gold) !important;
+            border-color: var(--gold) !important;
         }
         .klaro .cm-list-input:checked + .cm-list-label .slider::before {
             background: var(--blue-dark) !important;
+        }
+        /* Focus-Ring fuer Tastatur-Navigation */
+        .klaro .cm-list-input:focus-visible + .cm-list-label .slider {
+            outline: 3px solid var(--gold) !important;
+            outline-offset: 3px !important;
         }
 
         /* Links */
