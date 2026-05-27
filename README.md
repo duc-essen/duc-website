@@ -49,17 +49,33 @@ order: 7
 Beschreibungstext der Karte. Markdown + inline HTML erlaubt.
 ```
 
-### Vorstand (Footer)
+### Vorstand (Footer + Impressum)
 
-Eine einzelne JSON-Datei: [`src/data/vorstand.json`](./src/data/vorstand.json). Einfach Liste editieren — Reihenfolge ueber `order`.
+Eine einzelne JSON-Datei: [`src/data/vorstand.json`](./src/data/vorstand.json). Einfach Liste editieren — Reihenfolge ueber `order`. Beide Stellen (Footer & Impressum) spiegeln automatisch.
 
 ### Mitgliedsbeitraege
 
 [`src/data/preise.json`](./src/data/preise.json) — `icon` nur `erwachsene` | `familie` | `jugend`.
 
-### Layout-Texte und Strukturseiten
+### Vereinsstammdaten (Adresse, E-Mail, Registergericht, Trainingsort, Sportarten)
 
-Reine Layout-Inhalte (Hero-Tagline, Trainingszeiten, Kontaktdaten, Mitgliedschafts-Badges) liegen direkt in den Astro-Komponenten unter [`src/components/`](./src/components/). Aenderungen dort funktionieren genauso (kleinere Code-Edits), benoetigen aber etwas mehr Vorsicht beim HTML.
+[`src/data/verein.json`](./src/data/verein.json) — wird in Footer, Impressum, Datenschutz **und JSON-LD/SEO** gelesen. Eine Adressaenderung hier propagiert in alle 4 Stellen.
+
+### Hero-Titel + Tagline + CTAs
+
+[`src/data/hero.json`](./src/data/hero.json) — `titleLine1`, `titleLine2`, `tagline`, `ctaPrimary`, `ctaSecondary`.
+
+### Kennzahlen (Stats)
+
+[`src/data/stats.json`](./src/data/stats.json) — 4 Eintraege mit `wert` (string, fuer „60+") und `label`.
+
+### Section-Titel, Subtitel, Navbar-Label, CTAs
+
+Pro Sektion eine `.md`-Datei in [`src/content/sections/`](./src/content/sections/). Frontmatter `title`, `subtitle`, `navLabel`, `order`, optional `cta`.
+
+### Trainings-Bilder (optimiert)
+
+In [`src/assets/training/`](./src/assets/training/) ablegen — werden zur Build-Zeit von Astro zu WebP konvertiert + responsive (3 Groessen) generiert. Im Frontmatter `src/content/sections/training.md` als `/images/training/<dateiname>.jpg` referenzieren.
 
 ## Deployment
 

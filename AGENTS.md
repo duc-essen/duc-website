@@ -10,10 +10,13 @@ Ziel dieser Datei: **wer das hier in 60 Sekunden liest, kann sofort sinnvoll Aen
 
 - **Was:** Statische Vereinswebsite, Astro v6, deployed auf GitHub Pages.
 - **Live:** [duc-essen.github.io/duc-website](https://duc-essen.github.io/duc-website/). Custom Domain `duc-essen.de` ist geplant, aber DNS steht aus (siehe „Custom-Domain umziehen" unten).
-- **Architektur:** Hybrid — `/` ist One-Pager mit allen Sektionen scrollbar; zusaetzlich gibt es **eigene Detail-Seiten pro Sektion** (`/angebote`, `/training`, ...).
-- **Inhalte:** Liegen als **Markdown + JSON** unter `src/content/` und `src/data/`. Pflege ohne Astro-Code anfassen zu muessen.
+- **Architektur:** Hybrid — `/` ist One-Pager mit allen Sektionen scrollbar; zusaetzlich gibt es **eigene Detail-Seiten pro Sektion** (`/angebote`, `/training`, ...). Click auf Anchor-Link aktualisiert URL via History API (teilbare URLs).
+- **Inhalte:** Liegen als **Markdown + JSON** unter `src/content/` und `src/data/`. Pflege ohne Astro-Code anfassen zu muessen. Termine kommen live aus dem Vereinsplaner-iCal-Feed (taegliches Cron-Rebuild).
 - **Schema-Validierung:** Zod-Schemas in [`src/content.config.ts`](./src/content.config.ts). Falsches Frontmatter = Build-Fehler in GitHub Actions = Site geht NICHT kaputt online.
-- **Deploy:** Push auf `main` → GitHub Actions ([`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml)) → fertig in ~30 s.
+- **Cookie-Banner:** Klaro lokal (`public/klaro/`). Google Maps + Vereinsplaner-Formular werden erst nach Consent geladen.
+- **SEO:** Auto-Sitemap (`/sitemap.xml`), `robots.txt`, JSON-LD `SportsClub` aus `verein.json`.
+- **Bilder:** Astro `<Image />` mit WebP + responsive srcset (Trainings-Bilder in `src/assets/`). Inter Variable lokal (kein Google-CDN).
+- **Deploy:** Push auf `main` → GitHub Actions ([`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml)) → fertig in ~30 s. Plus taeglicher Cron um 04:00 UTC fuer Termin-Updates.
 - **Lokal:** `npm install && npm run dev` (auf http://localhost:4321).
 
 ---
@@ -39,14 +42,18 @@ Quick-Lookup. **Erste Anlaufstelle**, bevor du Code suchst.
 | Hero (Titel, Tagline, beide CTA-Buttons) | [`src/data/hero.json`](./src/data/hero.json) |
 | Stats-Zahlen (60 Jahre, 45 Mitglieder, ...) | [`src/data/stats.json`](./src/data/stats.json) |
 | **Cookie-Banner-Konfiguration** | [`public/klaro/klaro-config.js`](./public/klaro/klaro-config.js) (Services, deutsche Texte) |
-| Cookie-Banner-Styling | `src/styles/global.css` — Block „Klaro Privacy Manager – Theme" |
-| **Bilder/Medien** | [`public/images/`](./public/images/) — neue Bilder hier ablegen, im Markdown als `/images/...` referenzieren (`assetUrl()` macht den Rest) |
-| Globales Design / CSS | [`src/styles/global.css`](./src/styles/global.css) |
-| SEO `<head>`, JSON-LD, Favicon, OG-Image | [`src/layouts/BaseLayout.astro`](./src/layouts/BaseLayout.astro) |
+| Cookie-Banner-Styling | [`src/styles/_klaro.css`](./src/styles/_klaro.css) |
+| **Bilder/Medien (statisch)** | [`public/images/`](./public/images/) — neue Bilder hier ablegen, im Markdown als `/images/...` referenzieren (`assetUrl()` macht den Rest) |
+| Trainings-Bilder (optimiert) | [`src/assets/training/`](./src/assets/training/) — werden zur Build-Zeit von Astro zu WebP optimiert + responsive |
+| **Hero (Tagline + CTAs)** | [`src/data/hero.json`](./src/data/hero.json) |
+| Globales Design / CSS | [`src/styles/global.css`](./src/styles/global.css) + Module (`_klaro.css`, `_animations.css`, `_a11y.css`) |
+| SEO `<head>` + JSON-LD | [`src/components/SeoHead.astro`](./src/components/SeoHead.astro) (liest aus `verein.json`) |
+| Layout-Scripts (Mobile-Menu, Scroll-Spy, History API, Back-to-Top) | [`src/scripts/layout.ts`](./src/scripts/layout.ts) |
 | GitHub-Actions-Workflow | [`.github/workflows/deploy.yml`](./.github/workflows/deploy.yml) |
 | Astro-Routing/Site/Base + Sitemap-Integration | [`astro.config.mjs`](./astro.config.mjs) |
-| Crawler-Regeln (Suchmaschinen) | [`public/robots.txt`](./public/robots.txt) (verweist auf `sitemap-index.xml`) |
-| Erlaubte Icon-Slugs erweitern | Schema in `content.config.ts` **und** entsprechende `*Icon.astro`-Komponente in [`src/components/icons/`](./src/components/icons/) |
+| Crawler-Regeln (Suchmaschinen) | [`public/robots.txt`](./public/robots.txt) (verweist auf `sitemap.xml`) |
+| Erlaubte Icon-Slugs erweitern | Slugs in [`src/types/icons.ts`](./src/types/icons.ts) + SVG-Markup in [`src/components/icons.ts`](./src/components/icons.ts) |
+| Section-Dispatch (neue Sektion) | [`src/components/SectionRenderer.astro`](./src/components/SectionRenderer.astro) (COMPONENTS-Map) |
 
 **Nach Aenderung:** lokal `npm run dev` oder direkt `git commit && git push` — Action validiert + deployt.
 
@@ -55,43 +62,60 @@ Quick-Lookup. **Erste Anlaufstelle**, bevor du Code suchst.
 ## Architektur in einem Bild
 
 ```
-┌──────────────────────────────────────────────────────────────────────┐
-│  Markdown / JSON unter src/content/ + src/data/                      │
-│                                                                      │
-│   src/content/sections/<slug>.md   ← Section-Metadaten (7 Files)     │
-│        + optional Section-spezifische Strukturdaten im Frontmatter   │
-│   src/content/<items>/*.md         ← Items-Listen (angebote, etc.)   │
-│   src/data/<file>.json             ← Reine Daten (vorstand, preise)  │
-└─────────────────────────┬────────────────────────────────────────────┘
-                          │ (Zod-Schemas validieren beim Build)
+┌────────────────────────────────────────────────────────────────────────┐
+│  Datenquellen                                                          │
+│                                                                        │
+│   src/content/sections/<slug>.md   ← Section-Metadaten (7 Files)       │
+│   src/content/<items>/*.md         ← Markdown-Listen (angebote, etc.)  │
+│   src/data/<file>.json             ← JSON-Daten (vorstand, preise,     │
+│                                        stats, hero, verein)            │
+│   Vereinsplaner-iCal-Feed (extern) ← veranstaltungen, vergangene,      │
+│                                        trainings (gepullt im Build)    │
+└─────────────────────────┬──────────────────────────────────────────────┘
+                          │ Zod-Schemas (src/content.config.ts)
                           ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│  src/content.config.ts                                               │
-│  Definiert 7 Collections: sections, angebote, mitgliedschaften,      │
-│  veranstaltungen, geschichte, vorstand, preise                       │
-└─────────────────────────┬────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│  Astro Content Collections                                             │
+│                                                                        │
+│   getCollection('sections')     → Section-Metadaten                    │
+│   getCollection('angebote')     → 6 Karten                             │
+│   getCollection('geschichte')   → 6 Timeline-Eintraege                 │
+│   getCollection('mitgliedschaften') → 3 Verbaende                      │
+│   getCollection('vorstand')     → 5 Personen                           │
+│   getCollection('preise')       → 3 Beitragsstufen                     │
+│   getCollection('stats')        → 4 Kennzahlen                         │
+│   getCollection('veranstaltungen')  → oeffentliche Termine             │
+│   getCollection('vergangene-termine') → letzte 6 oeffentliche          │
+│   getCollection('trainings')    → naechste 6 DUC-Trainings             │
+│   import verein from '.../verein.json'  ← Stammdaten                   │
+│   import hero from '.../hero.json'      ← Hero-Tagline + CTAs          │
+└─────────────────────────┬──────────────────────────────────────────────┘
                           │
                           ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│  Astro-Komponenten lesen via getCollection() + render()              │
-│                                                                      │
-│   SectionRenderer.astro  ← dispatched section.id → richtige Komp.    │
-│   {Angebote,Training,...}.astro  ← rendert eine Section              │
-│   Navbar.astro / Footer.astro  ← liest sections-Collection           │
-│                                                                      │
-│  Props-Konvention: `section: CollectionEntry<'sections'>`            │
-│                    `isStandalone?: boolean`                          │
-└─────────────────────────┬────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│  Komponenten                                                           │
+│                                                                        │
+│   Layout:        BaseLayout → SeoHead, Bubbles, BackToTop +            │
+│                  scripts/layout.ts (Mobile-Menu, Scroll, History API)  │
+│   Sections:      SectionRenderer dispatched via COMPONENTS-Map         │
+│                  (angebote, training, geschichte, veranstaltungen,     │
+│                   preise, kontakt, mitgliedschaften)                   │
+│   Wiederverwendet: CtaButton, Icon (catalog+name), DucLogo             │
+│                                                                        │
+│   Props-Konvention: `section: CollectionEntry<'sections'>`             │
+│                     `isStandalone?: boolean`                           │
+└─────────────────────────┬──────────────────────────────────────────────┘
                           │
                           ▼
-┌──────────────────────────────────────────────────────────────────────┐
-│  Pages — generieren statische HTML-Routen                            │
-│                                                                      │
-│   src/pages/index.astro       → /                (One-Pager)         │
-│   src/pages/[slug].astro      → /angebote, ...   (Detail je Sect.)   │
-│   src/pages/impressum.astro   → /impressum       (LegalLayout)       │
-│   src/pages/datenschutz.md    → /datenschutz     (LegalLayout)       │
-└──────────────────────────────────────────────────────────────────────┘
+┌────────────────────────────────────────────────────────────────────────┐
+│  Pages — generieren statische HTML-Routen                              │
+│                                                                        │
+│   src/pages/index.astro       → /                (One-Pager)           │
+│   src/pages/[slug].astro      → /angebote, ...   (Detail je Section)   │
+│   src/pages/impressum.astro   → /impressum       (LegalLayout)         │
+│   src/pages/datenschutz.astro → /datenschutz     (LegalLayout)         │
+│   + automatisch generiert: /sitemap.xml, /robots.txt                   │
+└────────────────────────────────────────────────────────────────────────┘
 ```
 
 **Eintrittspunkte beim Build:** `index.astro` (rendert alle Sections inline) und `[slug].astro` (`getStaticPaths` ueber sections-Collection → eine HTML-Seite pro Section).
@@ -240,10 +264,16 @@ interface Props {
 Sie rendern eine `<section id={section.id}>...</section>` mit konsistentem Section-Titel-Block. Sektion-spezifische Strukturdaten kommen aus `section.data.training` / `section.data.kontakt` etc. Items-Collections werden per `getCollection('xyz')` geladen.
 
 ### `SectionRenderer.astro`
-Dispatcher. Bekommt `section` und `isStandalone`, rendert die passende konkrete Komponente nach `section.id`. **Wenn du eine neue Sektion hinzufuegst, hier den Switch erweitern.**
+Map-Dispatcher. Bekommt `section` und `isStandalone`, schlaegt im `COMPONENTS`-Object nach und rendert die passende Komponente. **Wenn du eine neue Sektion hinzufuegst, hier den Map-Eintrag ergaenzen.** Bei unbekannter `section.id` wird ein klarer Build-Fehler geworfen.
 
 ### Hero + Stats
-Hartcodiert in eigenen Komponenten, **nicht** in sections-Collection. Stats wird im One-Pager nach Geschichte eingefuegt (siehe `index.astro`). Hero erscheint nur auf `/`, nicht auf Detail-Seiten.
+Eigene Komponenten (Hero, Stats), nicht in sections-Collection. Inhalt kommt aus `src/data/hero.json` bzw. `src/data/stats.json`. Stats wird im One-Pager nach Geschichte eingefuegt (siehe `index.astro`). Hero erscheint nur auf `/`, nicht auf Detail-Seiten.
+
+### `<CtaButton />`
+Zentrale Komponente fuer alle Call-to-Action-Buttons. Kapselt die `ctaHref()`-Logik (Section-Slug → Anchor oder Pfad je nach Kontext), unterstuetzt externe URLs (http/mailto/tel werden 1:1 durchgereicht), Varianten (`primary`/`secondary`), `target="_blank"` (setzt automatisch `rel="noopener"`) und optionalen `class`-Pass-through. Wird in 6+ Stellen statt direkter `<a class="btn btn-primary">`-Tags verwendet.
+
+### `<Icon />`
+Generische Icon-Komponente — `<Icon catalog="angebot" name="freitauchen" />`. SVG-Map in `src/components/icons.ts`, Slug-Typen in `src/types/icons.ts`. Bei unbekanntem Slug Build-Fehler. Ersetzt 5 vorher spezialisierte Icon-Komponenten (~110 Zeilen Duplikation entfernt).
 
 ### Pages/Detail-Layout
 `src/pages/[slug].astro` macht `getStaticPaths` ueber alle sections-Eintraege. Standalone-Pages bekommen `padding-top: 6rem` damit Inhalt nicht hinter der Fixed-Navbar verschwindet.
@@ -252,7 +282,7 @@ Hartcodiert in eigenen Komponenten, **nicht** in sections-Collection. Stats wird
 `src/pages/impressum.astro` und `src/pages/datenschutz.astro` nutzen `LegalLayout.astro` als Wrapper. Inhalte werden als HTML in Astro (nicht Markdown) geschrieben, damit dynamische Daten aus `verein.json` + `vorstand.json` per `getCollection`/`import` eingebunden werden koennen. **Adressaenderungen → `verein.json` editieren, beides spiegelt automatisch.**
 
 ### Cookie-Banner (Klaro!)
-`public/klaro/klaro.js` (lokal gehostet, kein CDN-Call) + `public/klaro/klaro-config.js` definieren das Banner. In `BaseLayout.astro` werden beide per `<script is:inline defer>` eingebunden — Reihenfolge wichtig: Config zuerst, dann Klaro. Drittanbieter-Iframes (Google Maps in Training, Vereinsplaner in Kontakt) sind als `<iframe data-name="..." data-src="...">` markiert und werden nur nach Consent geladen. Theme (gold/blau) in `src/styles/global.css` unter „Klaro Privacy Manager – Theme". Footer hat einen „Cookie-Einstellungen"-Link der `klaro.show()` aufruft.
+`public/klaro/klaro.js` (lokal gehostet, kein CDN-Call) + `public/klaro/klaro-config.js` definieren das Banner. In `BaseLayout.astro` werden beide per `<script is:inline defer>` eingebunden — Reihenfolge wichtig: Config zuerst, dann Klaro. Drittanbieter-Iframes (Google Maps in Training, Vereinsplaner in Kontakt) sind als `<iframe data-name="..." data-src="...">` markiert und werden nur nach Consent geladen. Theme (gold/blau) in [`src/styles/_klaro.css`](./src/styles/_klaro.css). Footer hat einen „Cookie-Einstellungen"-Link der `klaro.show()` aufruft.
 
 **Neuen Drittanbieter-Service hinzufuegen:**
 1. In `klaro-config.js` einen neuen Eintrag in `services[]` mit eindeutigem `name` + deutscher Beschreibung in `translations.de` ergaenzen.
@@ -339,7 +369,7 @@ npx astro sync       # types fuer Collections regenerieren (selten noetig)
 - **Umlaute in Doku/Code-Kommentaren vermeiden** (ASCII-freundlich, weil Terminal/Diff lesbarer). In Website-Inhalten selbstverstaendlich Umlaute verwenden.
 - **Schema first:** Neue Felder/Werte immer erst in `content.config.ts` deklarieren, sonst Build-Fehler.
 - **Keine externen Tracker / Analytics** ohne explizite Vorstands-Freigabe (Vereinsdatenschutz).
-- **SEO erhalten:** Meta-Tags, Open Graph, JSON-LD `SportsClub` aus `BaseLayout.astro` muessen erhalten bleiben.
+- **SEO erhalten:** Meta-Tags, Open Graph, JSON-LD `SportsClub` aus `SeoHead.astro` muessen erhalten bleiben.
 - **Keine destruktiven Git-Aktionen** (force-push, reset --hard) ohne Rueckfrage.
 
 ### LSP-Warnings die man ignorieren kann
@@ -356,11 +386,11 @@ Wenn man trotzdem aufraeumen will: Zod-Import auf `import { z } from 'astro/zod'
 
 ## Known Limitations / Kleine Schulden
 
-- **Bubbles im BaseLayout** (10× `<div class="bubble">`) sind hartcodiert + 10 `:nth-child` CSS-Regeln. Sollte als Astro-Loop refaktoriert werden (siehe [REFACTOR.md](./REFACTOR.md) Punkt 6).
-- **Inline-Styles** sind in vielen Komponenten noch reichlich vorhanden (1:1 aus dem Single-File-Entwurf uebernommen). Refactor in CSS-Klassen ist „nice to have", aber funktional irrelevant.
-- **Stats-Counter-Animation** (`data-target`-Attribut) wird im aktuellen JS nicht angesprochen — Zahlen sind statisch.
 - **`mitgliedschaften`** ist in der `sections`-Collection und hat eine eigene Detail-Seite, taucht aber bewusst nicht in der Navbar auf (`navLabel` ist nicht gesetzt). Wenn das doch erwuenscht ist: `navLabel: Mitgliedschaften` in `sections/mitgliedschaften.md` setzen.
+- **Stats-Counter-Animation** — Zahlen sind statisch. Optional: IntersectionObserver-basierter Counter in `src/scripts/layout.ts` ergaenzen.
 - **`widdauen-2023.mp4`** in `public/media/` ist 91 MB. Funktioniert (unter GitHubs 100-MB-Hard-Limit), aber das Repo waechst dauerhaft. Bei weiteren grossen Videos: Git LFS einrichten oder externes Hosting (z.B. tmhart.de wo das Video herkam) verwenden.
+- **Gallery-Bilder** in `public/images/gallery/` (5 Bilder + 1 Video) liegen ungenutzt im Repo. Bereit fuer eine zukuenftige Galerie-Sektion oder `/galerie`-Detail-Seite.
+- **`.fade-in`-Animation** wird aktuell pro Karte ausgeloest — Karten flackern beim Scroll asynchron. Stattdessen pro Container-Sektion observieren waere harmonischer.
 
 ---
 
