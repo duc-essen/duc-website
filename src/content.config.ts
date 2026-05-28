@@ -68,7 +68,8 @@ const mitgliedschaften = defineCollection({
     name: z.string(),
     untertitel: z.string(),
     url: z.string().url(),
-    // logoUrl kann lokal ("/images/...") oder extern ("https://...") sein.
+    // Filename in src/assets/mitgliedschaften/ (z.B. "cmas.png").
+    // Wird zur Build-Zeit per import.meta.glob aufgeloest + zu WebP optimiert.
     logoUrl: z.string(),
     order: z.number(),
   }),
